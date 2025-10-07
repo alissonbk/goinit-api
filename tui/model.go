@@ -37,6 +37,7 @@ var _ tea.Model = (*TuiModel)(nil)
 type TuiModel struct {
 	cursor        int
 	currentPage   int
+	form          form
 	configuration Configuration
 	selected      map[int]uint8 // uint8 will be any constant type also works for y/n case
 }
@@ -45,7 +46,10 @@ func NewTuiModel() TuiModel {
 	return TuiModel{
 		cursor:      0,
 		currentPage: 0,
-		selected:    make(map[int]uint8),
+		form: form{
+			projectName: initialProjectNameInput(),
+		},
+		selected: make(map[int]uint8),
 	}
 }
 
