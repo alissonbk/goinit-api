@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"fmt"
+
 	"github.com/alissonbk/goinit-api/constant"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -23,33 +25,39 @@ type Configuration struct {
 	Dockerfile          bool
 }
 
-var style = lipgloss.NewStyle().
-	Bold(true).
-	Foreground(lipgloss.Color("#FAFAFA")).
-	Background(lipgloss.Color("#3C3C3C")).
-	PaddingTop(2).
-	PaddingLeft(4).
-	PaddingBottom(2).
-	Width(80)
+const (
+	hotPink  = lipgloss.Color("#FF06B7")
+	darkGray = lipgloss.Color("#767676")
+)
+
+// var style = lipgloss.NewStyle().
+// 	Bold(true).
+// 	Foreground(hotPink).
+// 	Background(darkGray).
+// 	PaddingTop(2).
+// 	PaddingLeft(4).
+// 	PaddingBottom(2).
+// 	Width(80)
+
+var inputStyle = lipgloss.NewStyle().Foreground(hotPink)
+
+var grayStyle = lipgloss.NewStyle().Foreground(darkGray)
 
 var _ tea.Model = (*TuiModel)(nil)
 
 type TuiModel struct {
-	cursor        int
 	currentPage   int
-	form          form
+	form          *form
+	err           error
 	configuration Configuration
 	selected      map[int]uint8 // uint8 will be any constant type also works for y/n case
 }
 
 func NewTuiModel() TuiModel {
 	return TuiModel{
-		cursor:      0,
 		currentPage: 0,
-		form: form{
-			projectName: initialProjectNameInput(),
-		},
-		selected: make(map[int]uint8),
+		form:        newForm(),
+		selected:    make(map[int]uint8),
 	}
 }
 
@@ -60,15 +68,60 @@ func (m TuiModel) Init() tea.Cmd {
 func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q":
+		switch msg.Type {
+
+		case tea.KeyEnter:
+			// FIXME: do a better checking
+			if m.form.projectName.Value() == "" {
+				m.err = fmt.Errorf("please inform a project name")
+				return m, nil
+			}
+			m.currentPage += 1
+		case tea.KeyCtrlC:
 			return m, tea.Quit
+
 		}
+
+		m.form.projectName.Focus()
+	case error:
+		fmt.Println("reached an error, ", msg)
+		m.err = msg
+		return m, nil
 	}
 
-	return m, nil
+	m2, cmd := m.form.projectName.Update(msg)
+	m.form.projectName = m2
+	return m, tea.Batch([]tea.Cmd{cmd}...)
 }
 
 func (m TuiModel) View() string {
-	return style.Render("press ctrl+c or q to quit.")
+
+	if m.currentPage == 1 {
+		return fmt.Sprintf(`
+
+
+	%s
+	%s
+
+
+
+	%s
+	`,
+			inputStyle.Bold(true).Width(30).Render("Inputed project name:"),
+			inputStyle.Render(m.form.projectName.Value()),
+			grayStyle.Render("press ctrl+c to quit."))
+	}
+	return fmt.Sprintf(`
+
+
+	%s
+	%s
+
+
+
+	%s
+	`,
+		inputStyle.Bold(true).Width(30).Render("Project Name"),
+		inputStyle.Render(m.form.projectName.View()),
+		grayStyle.Render("press ctrl+c to quit."))
 }
