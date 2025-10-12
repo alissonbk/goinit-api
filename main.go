@@ -9,7 +9,8 @@ import (
 )
 
 func main() {
-	p := tea.NewProgram(tui.NewTuiModel())
+	m := tui.NewTuiModel()
+	p := tea.NewProgram(m, tea.WithAltScreen())
 
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Failed to run teabubble program %v", err)

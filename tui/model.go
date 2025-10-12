@@ -101,14 +101,12 @@ func (m TuiModel) View() string {
 
 
 	%s
-	%s
 
 
 
 	%s
 	`,
-			inputStyle.Bold(true).Width(30).Render("Inputed project name:"),
-			inputStyle.Render(m.form.projectName.Value()),
+			m.form.httpLibrary.View(),
 			grayStyle.Render("press ctrl+c to quit."))
 	}
 	return fmt.Sprintf(`
