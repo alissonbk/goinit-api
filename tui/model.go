@@ -30,6 +30,8 @@ const (
 	darkGray = lipgloss.Color("#767676")
 )
 
+var docStyle = lipgloss.NewStyle().Margin(1, 2)
+
 // var style = lipgloss.NewStyle().
 // 	Bold(true).
 // 	Foreground(hotPink).
@@ -77,6 +79,7 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			m.currentPage += 1
+
 		case tea.KeyCtrlC:
 			return m, tea.Quit
 
@@ -87,8 +90,17 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		fmt.Println("reached an error, ", msg)
 		m.err = msg
 		return m, nil
+
+	case tea.WindowSizeMsg:
+		h, v := docStyle.GetFrameSize()
+		m.form.httpLibrary.SetSize(msg.Width-h, msg.Height-v)
 	}
 
+	if m.currentPage == 1 {
+		m2, cmd := m.form.httpLibrary.Update(msg)
+		m.form.httpLibrary = m2
+		return m, tea.Batch([]tea.Cmd{cmd}...)
+	}
 	m2, cmd := m.form.projectName.Update(msg)
 	m.form.projectName = m2
 	return m, tea.Batch([]tea.Cmd{cmd}...)
@@ -101,7 +113,6 @@ func (m TuiModel) View() string {
 
 
 	%s
-
 
 
 	%s
