@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/alissonbk/goinit-api/constant"
+	"github.com/alissonbk/goinit-api/utils"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -99,6 +100,7 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.currentPage == 1 {
 		m2, cmd := m.form.httpLibrary.Update(msg)
 		m.form.httpLibrary = m2
+		m2.ResetSelected()
 		return m, tea.Batch([]tea.Cmd{cmd}...)
 	}
 	m2, cmd := m.form.projectName.Update(msg)
@@ -107,7 +109,24 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m TuiModel) View() string {
+	if m.currentPage > 2 {
+		m.currentPage = 0
+	}
+	if m.currentPage == 0 {
+		return fmt.Sprintf(`
 
+
+	%s
+	%s
+
+
+
+	%s
+	`,
+			inputStyle.Bold(true).Width(30).Render("Project Name"),
+			inputStyle.Render(m.form.projectName.View()),
+			grayStyle.Render("press ctrl+c to quit."))
+	}
 	if m.currentPage == 1 {
 		return fmt.Sprintf(`
 
@@ -120,17 +139,14 @@ func (m TuiModel) View() string {
 			m.form.httpLibrary.View(),
 			grayStyle.Render("press ctrl+c to quit."))
 	}
+	utils.ClearScreen()
 	return fmt.Sprintf(`
-
-
-	%s
-	%s
-
-
-
-	%s
+	
+		Project name: %s
+		Http library: %s
 	`,
-		inputStyle.Bold(true).Width(30).Render("Project Name"),
-		inputStyle.Render(m.form.projectName.View()),
-		grayStyle.Render("press ctrl+c to quit."))
+		inputStyle.Width(30).Render(m.form.projectName.Value()),
+		inputStyle.Width(30).Render(m.form.httpLibrary.SelectedItem().FilterValue()),
+	)
+
 }
