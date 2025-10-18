@@ -67,6 +67,7 @@ const (
 	Mssql
 	Clickhouse
 	Oci8
+	_endDatabaseDriver
 )
 
 func (d DatabaseDriver) ToString() string {
@@ -88,6 +89,15 @@ func (d DatabaseDriver) ToString() string {
 	default:
 		return "unknown"
 	}
+}
+
+func AllDatabaseDrivers() []string {
+	lst := make([]string, _endDatabaseDriver)
+	for i := range _endDatabaseDriver {
+		lst[i] = DatabaseDriver(i).ToString()
+	}
+
+	return lst
 }
 
 type LoggingOptions uint8
@@ -117,7 +127,18 @@ const (
 	WARN
 	ERROR
 	SILENT
+	_endLogLevel
 )
+
+func AllLogLevels() []string {
+	lst := make([]string, _endLogLevel)
+
+	for i := range _endLogLevel {
+		lst[i] = LogLevel(i).ToString()
+	}
+
+	return lst
+}
 
 func (l LogLevel) ToString() string {
 	switch l {
