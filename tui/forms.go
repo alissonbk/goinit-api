@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"reflect"
+
 	"github.com/alissonbk/goinit-api/constant"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -18,20 +20,32 @@ func (i listItem) Title() string       { return i.title }
 func (i listItem) Description() string { return i.desc }
 func (i listItem) FilterValue() string { return i.title }
 
+// !! IMPORTANT !!
+// the position of the attributes are important as reflection is used to get
 type form struct {
 	projectName        textinput.Model
-	httpLibrary        list.Model
-	projectStructure   list.Model
-	databaseQueries    list.Model
-	databaseDriver     list.Model
-	logging            list.Model
-	loggingDefault     list.Model
-	loggingNested      list.Model
-	loggingLevel       list.Model
-	keycloakSA         list.Model
-	customPanicHandler list.Model
-	godotenv           list.Model
-	dockerfile         list.Model
+	HttpLibrary        list.Model
+	ProjectStructure   list.Model
+	DatabaseQueries    list.Model
+	DatabaseDriver     list.Model
+	Logging            list.Model
+	LoggingDefault     list.Model
+	LoggingNested      list.Model
+	LoggingLevel       list.Model
+	KeycloakSA         list.Model
+	CustomPanicHandler list.Model
+	Godotenv           list.Model
+	Dockerfile         list.Model
+}
+
+func (f *form) getAttributeByReflectionIndex(index int) *list.Model {
+	if index <= 0 || index > 12 {
+		panic("takeAttributeByReflectionIndex should have a index between 1 - 12")
+	}
+	formValue := reflect.ValueOf(*f)
+	lm := (formValue.Field(index).Interface()).(list.Model)
+
+	return &lm
 }
 
 func defaultBoolList(trueTitle string, falseTitle string) list.Model {
@@ -71,7 +85,7 @@ func defaultFromList(lst []string) list.Model {
 func newForm() *form {
 	return &form{
 		projectName: initialProjectNameInput(),
-		httpLibrary: list.New([]list.Item{
+		HttpLibrary: list.New([]list.Item{
 			listItem{
 				title:  "Gin",
 				desc:   "Lightweight simple usage http library...",
@@ -88,7 +102,7 @@ func newForm() *form {
 				evalue: uint8(constant.Gin),
 			},
 		}, list.NewDefaultDelegate(), 0, 0),
-		projectStructure: list.New([]list.Item{
+		ProjectStructure: list.New([]list.Item{
 			listItem{
 				title:  "MVC",
 				desc:   "MVC project structure",
@@ -100,7 +114,7 @@ func newForm() *form {
 				evalue: uint8(constant.MVC),
 			},
 		}, list.NewDefaultDelegate(), 0, 0),
-		databaseQueries: list.New([]list.Item{
+		DatabaseQueries: list.New([]list.Item{
 			listItem{
 				title:  "GORM",
 				desc:   "A ORM library for Golang.",
@@ -112,8 +126,8 @@ func newForm() *form {
 				evalue: uint8(constant.MVC),
 			},
 		}, list.NewDefaultDelegate(), 0, 0),
-		databaseDriver: defaultFromList(constant.AllDatabaseDrivers()),
-		logging: list.New(
+		DatabaseDriver: defaultFromList(constant.AllDatabaseDrivers()),
+		Logging: list.New(
 			[]list.Item{
 				listItem{
 					title:  "Logrus",
@@ -128,13 +142,13 @@ func newForm() *form {
 			}, list.NewDefaultDelegate(), 0, 0,
 		),
 
-		loggingDefault:     defaultBoolList("Yes", "No"),
-		loggingNested:      defaultBoolList("Nested", "Structured"),
-		loggingLevel:       defaultFromList(constant.AllLogLevels()),
-		keycloakSA:         defaultBoolList("Yes", "No"),
-		customPanicHandler: defaultBoolList("Yes", "No"),
-		godotenv:           defaultBoolList("Yes", "No"),
-		dockerfile:         defaultBoolList("Yes", "No"),
+		LoggingDefault:     defaultBoolList("Yes", "No"),
+		LoggingNested:      defaultBoolList("Nested", "Structured"),
+		LoggingLevel:       defaultFromList(constant.AllLogLevels()),
+		KeycloakSA:         defaultBoolList("Yes", "No"),
+		CustomPanicHandler: defaultBoolList("Yes", "No"),
+		Godotenv:           defaultBoolList("Yes", "No"),
+		Dockerfile:         defaultBoolList("Yes", "No"),
 	}
 }
 

@@ -27,8 +27,22 @@ type Configuration struct {
 }
 
 const (
-	hotPink  = lipgloss.Color("#FF06B7")
-	darkGray = lipgloss.Color("#767676")
+	hotPink                 = lipgloss.Color("#FF06B7")
+	darkGray                = lipgloss.Color("#767676")
+	projectNamePage         = 0
+	httpLibraryPage         = 1
+	projectStructurePage    = 2
+	databaseQueriesPage     = 3
+	databaseDriverPage      = 4
+	loggingPage             = 5
+	loggingDefaultPage      = 6
+	loggingNestedPage       = 7
+	loggingLevelPage        = 8
+	keycloakServiceAuthPage = 9
+	customPanicHandlerPage  = 10
+	godotEnvPage            = 11
+	dockerfilePage          = 12
+	_endPage                = 13
 )
 
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
@@ -68,6 +82,14 @@ func (m TuiModel) Init() tea.Cmd {
 	return nil
 }
 
+func (m TuiModel) updateListModel(msg tea.Msg, attributeIndex int) (TuiModel, tea.Cmd) {
+	reflectedAttribute := m.form.getAttributeByReflectionIndex(attributeIndex)
+	m2, cmd := reflectedAttribute.Update(msg)
+	*reflectedAttribute = m2
+	(*reflectedAttribute).ResetSelected()
+	return m, tea.Batch([]tea.Cmd{cmd}...)
+}
+
 func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -94,23 +116,73 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
-		m.form.httpLibrary.SetSize(msg.Width-h, msg.Height-v)
+		for i := 1; i < _endPage; i++ {
+			m.form.getAttributeByReflectionIndex(i).SetSize(msg.Width-h, msg.Height-v)
+		}
+
 	}
 
-	if m.currentPage == 1 {
-		m2, cmd := m.form.httpLibrary.Update(msg)
-		m.form.httpLibrary = m2
-		m2.ResetSelected()
+	if m.currentPage == projectNamePage {
+		m2, cmd := m.form.projectName.Update(msg)
+		m.form.projectName = m2
 		return m, tea.Batch([]tea.Cmd{cmd}...)
 	}
-	m2, cmd := m.form.projectName.Update(msg)
-	m.form.projectName = m2
-	return m, tea.Batch([]tea.Cmd{cmd}...)
+
+	if m.currentPage == httpLibraryPage {
+		return m.updateListModel(msg, httpLibraryPage)
+	}
+
+	if m.currentPage == projectStructurePage {
+		return m.updateListModel(msg, projectStructurePage)
+	}
+
+	if m.currentPage == databaseQueriesPage {
+		return m.updateListModel(msg, databaseQueriesPage)
+	}
+
+	if m.currentPage == databaseDriverPage {
+		return m.updateListModel(msg, databaseDriverPage)
+	}
+
+	if m.currentPage == loggingPage {
+		return m.updateListModel(msg, loggingPage)
+	}
+
+	if m.currentPage == loggingDefaultPage {
+		return m.updateListModel(msg, loggingDefaultPage)
+	}
+
+	if m.currentPage == loggingNestedPage {
+		return m.updateListModel(msg, loggingNestedPage)
+	}
+
+	if m.currentPage == loggingLevelPage {
+		return m.updateListModel(msg, loggingLevelPage)
+	}
+
+	if m.currentPage == keycloakServiceAuthPage {
+		return m.updateListModel(msg, keycloakServiceAuthPage)
+	}
+
+	if m.currentPage == customPanicHandlerPage {
+		return m.updateListModel(msg, customPanicHandlerPage)
+	}
+
+	if m.currentPage == godotEnvPage {
+		return m.updateListModel(msg, godotEnvPage)
+	}
+
+	if m.currentPage == dockerfilePage {
+		return m.updateListModel(msg, dockerfilePage)
+	}
+
+	fmt.Printf("didn't match any page")
+	return m, nil
 }
 
 func (m TuiModel) View() string {
 	if m.currentPage > 2 {
-		m.currentPage = 0
+		m.currentPage = projectNamePage
 	}
 	if m.currentPage == 0 {
 		return fmt.Sprintf(`
@@ -127,7 +199,7 @@ func (m TuiModel) View() string {
 			inputStyle.Render(m.form.projectName.View()),
 			grayStyle.Render("press ctrl+c to quit."))
 	}
-	if m.currentPage == 1 {
+	if m.currentPage == httpLibraryPage {
 		return fmt.Sprintf(`
 
 
@@ -136,7 +208,7 @@ func (m TuiModel) View() string {
 
 	%s
 	`,
-			m.form.httpLibrary.View(),
+			m.form.HttpLibrary.View(),
 			grayStyle.Render("press ctrl+c to quit."))
 	}
 	utils.ClearScreen()
@@ -146,7 +218,7 @@ func (m TuiModel) View() string {
 		Http library: %s
 	`,
 		inputStyle.Width(30).Render(m.form.projectName.Value()),
-		inputStyle.Width(30).Render(m.form.httpLibrary.SelectedItem().FilterValue()),
+		inputStyle.Width(30).Render(m.form.HttpLibrary.SelectedItem().FilterValue()),
 	)
 
 }
