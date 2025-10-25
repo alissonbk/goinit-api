@@ -85,8 +85,8 @@ func (m TuiModel) Init() tea.Cmd {
 func (m TuiModel) updateListModel(msg tea.Msg, attributeIndex int) (TuiModel, tea.Cmd) {
 	reflectedAttribute := m.form.getAttributeByReflectionIndex(attributeIndex)
 	m2, cmd := reflectedAttribute.Update(msg)
-	*reflectedAttribute = m2
-	(*reflectedAttribute).ResetSelected()
+	reflectedAttribute = &m2
+	(reflectedAttribute).ResetSelected()
 	return m, tea.Batch([]tea.Cmd{cmd}...)
 }
 
@@ -116,8 +116,10 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
+
 		for i := 1; i < _endPage; i++ {
-			m.form.getAttributeByReflectionIndex(i).SetSize(msg.Width-h, msg.Height-v)
+			m.form.updateListModelSizeByReflectionIndex(i, msg.Width-h*3, msg.Height-v*3)
+
 		}
 
 	}

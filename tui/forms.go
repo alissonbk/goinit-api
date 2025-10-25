@@ -21,21 +21,21 @@ func (i listItem) Description() string { return i.desc }
 func (i listItem) FilterValue() string { return i.title }
 
 // !! IMPORTANT !!
-// the position of the attributes are important as reflection is used to get
+// the position of the attributes are important as reflection is used to { getAttributeByReflectionIndex }
 type form struct {
 	projectName        textinput.Model
-	HttpLibrary        list.Model
-	ProjectStructure   list.Model
-	DatabaseQueries    list.Model
-	DatabaseDriver     list.Model
-	Logging            list.Model
-	LoggingDefault     list.Model
-	LoggingNested      list.Model
-	LoggingLevel       list.Model
-	KeycloakSA         list.Model
-	CustomPanicHandler list.Model
-	Godotenv           list.Model
-	Dockerfile         list.Model
+	HttpLibrary        *list.Model
+	ProjectStructure   *list.Model
+	DatabaseQueries    *list.Model
+	DatabaseDriver     *list.Model
+	Logging            *list.Model
+	LoggingDefault     *list.Model
+	LoggingNested      *list.Model
+	LoggingLevel       *list.Model
+	KeycloakSA         *list.Model
+	CustomPanicHandler *list.Model
+	Godotenv           *list.Model
+	Dockerfile         *list.Model
 }
 
 func (f *form) getAttributeByReflectionIndex(index int) *list.Model {
@@ -43,13 +43,22 @@ func (f *form) getAttributeByReflectionIndex(index int) *list.Model {
 		panic("takeAttributeByReflectionIndex should have a index between 1 - 12")
 	}
 	formValue := reflect.ValueOf(*f)
-	lm := (formValue.Field(index).Interface()).(list.Model)
+	return (formValue.Field(index).Interface()).(*list.Model)
 
-	return &lm
 }
 
-func defaultBoolList(trueTitle string, falseTitle string) list.Model {
-	return list.New(
+func (f *form) updateListModelSizeByReflectionIndex(index int, w int, h int) {
+	if index <= 0 || index > 12 {
+		panic("takeAttributeByReflectionIndex should have a index between 1 - 12")
+	}
+	formValue := reflect.ValueOf(*f)
+	lm := (formValue.Field(index).Interface()).(*list.Model)
+
+	lm.SetSize(w, h)
+}
+
+func defaultBoolList(trueTitle string, falseTitle string) *list.Model {
+	l := list.New(
 		[]list.Item{
 			listItem{
 				title:  trueTitle,
@@ -63,10 +72,12 @@ func defaultBoolList(trueTitle string, falseTitle string) list.Model {
 			},
 		}, list.NewDefaultDelegate(), 0, 0,
 	)
+
+	return &l
 }
 
-func defaultFromList(lst []string) list.Model {
-	return list.New(
+func defaultFromList(lst []string) *list.Model {
+	l := list.New(
 		func() []list.Item {
 			list := make([]list.Item, len(lst))
 			for i, s := range lst {
@@ -80,68 +91,75 @@ func defaultFromList(lst []string) list.Model {
 			return list
 		}(), list.NewDefaultDelegate(), 0, 0,
 	)
+
+	return &l
 }
 
 func newForm() *form {
-	return &form{
-		projectName: initialProjectNameInput(),
-		HttpLibrary: list.New([]list.Item{
-			listItem{
-				title:  "Gin",
-				desc:   "Lightweight simple usage http library...",
-				evalue: uint8(constant.Gin),
-			},
-			listItem{
-				title:  "Fiber",
-				desc:   "Fiber ...",
-				evalue: uint8(constant.Gin),
-			},
-			listItem{
-				title:  "Echo",
-				desc:   "Lightweight simple usage http library...",
-				evalue: uint8(constant.Gin),
-			},
-		}, list.NewDefaultDelegate(), 0, 0),
-		ProjectStructure: list.New([]list.Item{
-			listItem{
-				title:  "MVC",
-				desc:   "MVC project structure",
-				evalue: uint8(constant.MVC),
-			},
-			listItem{
-				title:  "Hexagonal",
-				desc:   "Simplified hexagonal project structure",
-				evalue: uint8(constant.MVC),
-			},
-		}, list.NewDefaultDelegate(), 0, 0),
-		DatabaseQueries: list.New([]list.Item{
-			listItem{
-				title:  "GORM",
-				desc:   "A ORM library for Golang.",
-				evalue: uint8(constant.MVC),
-			},
-			listItem{
-				title:  "sqlx",
-				desc:   "A set of extensions on go's standard database/sql",
-				evalue: uint8(constant.MVC),
-			},
-		}, list.NewDefaultDelegate(), 0, 0),
-		DatabaseDriver: defaultFromList(constant.AllDatabaseDrivers()),
-		Logging: list.New(
-			[]list.Item{
-				listItem{
-					title:  "Logrus",
-					desc:   "Structured logger for Go, completely API compatible with the standard library logger.",
-					evalue: uint8(constant.Logrus),
-				},
-				listItem{
-					title:  "uber/zap",
-					desc:   "Blazing fast, structured, leveled logging in Go.",
-					evalue: uint8(constant.Zap),
-				},
-			}, list.NewDefaultDelegate(), 0, 0,
-		),
+	httpLibrary := list.New([]list.Item{
+		listItem{
+			title:  "Gin",
+			desc:   "Lightweight simple usage http library...",
+			evalue: uint8(constant.Gin),
+		},
+		listItem{
+			title:  "Fiber",
+			desc:   "Fiber ...",
+			evalue: uint8(constant.Gin),
+		},
+		listItem{
+			title:  "Echo",
+			desc:   "Lightweight simple usage http library...",
+			evalue: uint8(constant.Gin),
+		},
+	}, list.NewDefaultDelegate(), 0, 0)
 
+	projectStruct := list.New([]list.Item{
+		listItem{
+			title:  "MVC",
+			desc:   "MVC project structure",
+			evalue: uint8(constant.MVC),
+		},
+		listItem{
+			title:  "Hexagonal",
+			desc:   "Simplified hexagonal project structure",
+			evalue: uint8(constant.MVC),
+		},
+	}, list.NewDefaultDelegate(), 0, 0)
+
+	databaseQueries := list.New([]list.Item{
+		listItem{
+			title:  "GORM",
+			desc:   "A ORM library for Golang.",
+			evalue: uint8(constant.MVC),
+		},
+		listItem{
+			title:  "sqlx",
+			desc:   "A set of extensions on go's standard database/sql",
+			evalue: uint8(constant.MVC),
+		},
+	}, list.NewDefaultDelegate(), 0, 0)
+	logging := list.New(
+		[]list.Item{
+			listItem{
+				title:  "Logrus",
+				desc:   "Structured logger for Go, completely API compatible with the standard library logger.",
+				evalue: uint8(constant.Logrus),
+			},
+			listItem{
+				title:  "uber/zap",
+				desc:   "Blazing fast, structured, leveled logging in Go.",
+				evalue: uint8(constant.Zap),
+			},
+		}, list.NewDefaultDelegate(), 0, 0,
+	)
+	return &form{
+		projectName:        initialProjectNameInput(),
+		HttpLibrary:        &httpLibrary,
+		ProjectStructure:   &projectStruct,
+		DatabaseQueries:    &databaseQueries,
+		DatabaseDriver:     defaultFromList(constant.AllDatabaseDrivers()),
+		Logging:            &logging,
 		LoggingDefault:     defaultBoolList("Yes", "No"),
 		LoggingNested:      defaultBoolList("Nested", "Structured"),
 		LoggingLevel:       defaultFromList(constant.AllLogLevels()),
