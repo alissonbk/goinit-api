@@ -2,7 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/alissonbk/goinit-api/constant"
 	"github.com/alissonbk/goinit-api/utils"
@@ -103,6 +102,10 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			m.currentPage += 1
+			// FIXME: remove this page rounding
+			if m.currentPage > _endPage {
+				m.currentPage = 0
+			}
 
 		case tea.KeyCtrlC:
 			return m, tea.Quit
@@ -179,41 +182,49 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateListModel(msg, dockerfilePage)
 	}
 
-	fmt.Fprintf(os.Stderr, "didn't match any page")
-	return m, nil
+	if m.currentPage == _endPage {
+		return m, nil
+	}
+
+	panic("didn't match any page")
+}
+
+func (m TuiModel) renderListViewByIndex(idx int) string {
+	attribute := m.form.getAttributeByReflectionIndex(idx)
+	return fmt.Sprintf(`
+
+
+		%s
+
+
+		%s
+		`,
+		attribute.View(),
+		grayStyle.Render("press ctrl+c to quit."))
 }
 
 func (m TuiModel) View() string {
-	if m.currentPage > 2 {
-		m.currentPage = projectNamePage
+	if m.currentPage > _endPage {
+		return fmt.Sprintf("end")
 	}
 	if m.currentPage == 0 {
 		return fmt.Sprintf(`
-
-
-	%s
-	%s
+		%s
+		%s
 
 
 
-	%s
-	`,
+		%s
+		`,
 			inputStyle.Bold(true).Width(30).Render("Project Name"),
 			inputStyle.Render(m.form.projectName.View()),
 			grayStyle.Render("press ctrl+c to quit."))
 	}
-	if m.currentPage == httpLibraryPage {
-		return fmt.Sprintf(`
 
-
-	%s
-
-
-	%s
-	`,
-			m.form.HttpLibrary.View(),
-			grayStyle.Render("press ctrl+c to quit."))
+	if m.currentPage < _endPage {
+		return m.renderListViewByIndex(m.currentPage)
 	}
+
 	utils.ClearScreen()
 	return fmt.Sprintf(`
 	
