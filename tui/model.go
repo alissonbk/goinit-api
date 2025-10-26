@@ -2,6 +2,7 @@ package tui
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/alissonbk/goinit-api/constant"
 	"github.com/alissonbk/goinit-api/utils"
@@ -85,7 +86,7 @@ func (m TuiModel) Init() tea.Cmd {
 func (m TuiModel) updateListModel(msg tea.Msg, attributeIndex int) (TuiModel, tea.Cmd) {
 	reflectedAttribute := m.form.getAttributeByReflectionIndex(attributeIndex)
 	m2, cmd := reflectedAttribute.Update(msg)
-	reflectedAttribute = &m2
+	m.form.setAttributeByReflectionIndex(attributeIndex, &m2)
 	(reflectedAttribute).ResetSelected()
 	return m, tea.Batch([]tea.Cmd{cmd}...)
 }
@@ -178,7 +179,7 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateListModel(msg, dockerfilePage)
 	}
 
-	fmt.Printf("didn't match any page")
+	fmt.Fprintf(os.Stderr, "didn't match any page")
 	return m, nil
 }
 

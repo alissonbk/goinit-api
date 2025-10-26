@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/alissonbk/goinit-api/constant"
@@ -45,6 +46,28 @@ func (f *form) getAttributeByReflectionIndex(index int) *list.Model {
 	formValue := reflect.ValueOf(*f)
 	return (formValue.Field(index).Interface()).(*list.Model)
 
+}
+
+func (f *form) setAttributeByReflectionIndex(idx int, newValue any) {
+	v := reflect.ValueOf(f).Elem()
+	if idx < 0 || idx >= v.NumField() {
+		panic("invalid field index")
+	}
+
+	field := v.Field(idx)
+
+	if !field.CanSet() {
+		panic("field cannot be set (is it unexported?)")
+	}
+
+	newVal := reflect.ValueOf(newValue)
+
+	// Convert types if possible
+	if newVal.Type() != field.Type() {
+		panic(fmt.Sprintf("type mismatch: expected %v, got %v", field.Type(), newVal.Type()))
+	}
+
+	field.Set(newVal)
 }
 
 func (f *form) updateListModelSizeByReflectionIndex(index int, w int, h int) {
