@@ -93,7 +93,7 @@ func defaultBoolList(trueTitle string, falseTitle string) *list.Model {
 				desc:   "",
 				evalue: uint8(0),
 			},
-		}, list.NewDefaultDelegate(), 0, 0,
+		}, list.NewDefaultDelegate(), 300, 300,
 	)
 
 	return &l
@@ -112,7 +112,7 @@ func defaultFromList(lst []string) *list.Model {
 			}
 
 			return list
-		}(), list.NewDefaultDelegate(), 0, 0,
+		}(), list.NewDefaultDelegate(), 300, 300,
 	)
 
 	return &l
@@ -135,7 +135,7 @@ func newForm() *form {
 			desc:   "Lightweight simple usage http library...",
 			evalue: uint8(constant.Gin),
 		},
-	}, list.NewDefaultDelegate(), 0, 0)
+	}, list.NewDefaultDelegate(), 300, 300)
 
 	projectStruct := list.New([]list.Item{
 		listItem{
@@ -148,7 +148,7 @@ func newForm() *form {
 			desc:   "Simplified hexagonal project structure",
 			evalue: uint8(constant.MVC),
 		},
-	}, list.NewDefaultDelegate(), 0, 0)
+	}, list.NewDefaultDelegate(), 300, 300)
 
 	databaseQueries := list.New([]list.Item{
 		listItem{
@@ -161,7 +161,7 @@ func newForm() *form {
 			desc:   "A set of extensions on go's standard database/sql",
 			evalue: uint8(constant.MVC),
 		},
-	}, list.NewDefaultDelegate(), 0, 0)
+	}, list.NewDefaultDelegate(), 300, 300)
 	logging := list.New(
 		[]list.Item{
 			listItem{
@@ -174,7 +174,7 @@ func newForm() *form {
 				desc:   "Blazing fast, structured, leveled logging in Go.",
 				evalue: uint8(constant.Zap),
 			},
-		}, list.NewDefaultDelegate(), 0, 0,
+		}, list.NewDefaultDelegate(), 300, 300,
 	)
 	return &form{
 		projectName:        initialProjectNameInput(),
