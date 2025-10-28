@@ -29,6 +29,7 @@ type Configuration struct {
 const (
 	hotPink                 = lipgloss.Color("#FF06B7")
 	darkGray                = lipgloss.Color("#767676")
+	blue                    = lipgloss.Color("#0090FF")
 	projectNamePage         = 0
 	httpLibraryPage         = 1
 	projectStructurePage    = 2
@@ -57,6 +58,8 @@ var docStyle = lipgloss.NewStyle().Margin(1, 2)
 // 	Width(80)
 
 var inputStyle = lipgloss.NewStyle().Foreground(hotPink)
+
+var listTitleStyle = lipgloss.NewStyle().PaddingLeft(1).PaddingRight(1).Background(blue)
 
 var grayStyle = lipgloss.NewStyle().Foreground(darkGray)
 

@@ -80,7 +80,7 @@ func (f *form) updateListModelSizeByReflectionIndex(index int, w int, h int) {
 	lm.SetSize(w, h)
 }
 
-func defaultBoolList(trueTitle string, falseTitle string) *list.Model {
+func defaultBoolList(trueTitle string, falseTitle string, title string) *list.Model {
 	l := list.New(
 		[]list.Item{
 			listItem{
@@ -95,11 +95,13 @@ func defaultBoolList(trueTitle string, falseTitle string) *list.Model {
 			},
 		}, list.NewDefaultDelegate(), 300, 300,
 	)
+	l.Title = title
+	l.Styles.Title = listTitleStyle
 
 	return &l
 }
 
-func defaultFromList(lst []string) *list.Model {
+func defaultFromList(lst []string, title string) *list.Model {
 	l := list.New(
 		func() []list.Item {
 			list := make([]list.Item, len(lst))
@@ -114,11 +116,13 @@ func defaultFromList(lst []string) *list.Model {
 			return list
 		}(), list.NewDefaultDelegate(), 300, 300,
 	)
+	l.Title = title
+	l.Styles.Title = listTitleStyle
 
 	return &l
 }
-
 func newForm() *form {
+
 	httpLibrary := list.New([]list.Item{
 		listItem{
 			title:  "Gin",
@@ -136,6 +140,8 @@ func newForm() *form {
 			evalue: uint8(constant.Gin),
 		},
 	}, list.NewDefaultDelegate(), 300, 300)
+	httpLibrary.Title = "Select an http library"
+	httpLibrary.Styles.Title = listTitleStyle
 
 	projectStruct := list.New([]list.Item{
 		listItem{
@@ -149,6 +155,8 @@ func newForm() *form {
 			evalue: uint8(constant.MVC),
 		},
 	}, list.NewDefaultDelegate(), 300, 300)
+	projectStruct.Title = "Select the project structure (folder organization)"
+	projectStruct.Styles.Title = listTitleStyle
 
 	databaseQueries := list.New([]list.Item{
 		listItem{
@@ -162,6 +170,9 @@ func newForm() *form {
 			evalue: uint8(constant.MVC),
 		},
 	}, list.NewDefaultDelegate(), 300, 300)
+	databaseQueries.Title = "Select which way to do database queries"
+	databaseQueries.Styles.Title = listTitleStyle
+
 	logging := list.New(
 		[]list.Item{
 			listItem{
@@ -176,20 +187,23 @@ func newForm() *form {
 			},
 		}, list.NewDefaultDelegate(), 300, 300,
 	)
+	logging.Title = "Select an logging library"
+	logging.Styles.Title = listTitleStyle
+
 	return &form{
 		projectName:        initialProjectNameInput(),
 		HttpLibrary:        &httpLibrary,
 		ProjectStructure:   &projectStruct,
 		DatabaseQueries:    &databaseQueries,
-		DatabaseDriver:     defaultFromList(constant.AllDatabaseDrivers()),
+		DatabaseDriver:     defaultFromList(constant.AllDatabaseDrivers(), "Select an database driver"),
 		Logging:            &logging,
-		LoggingDefault:     defaultBoolList("Yes", "No"),
-		LoggingNested:      defaultBoolList("Nested", "Structured"),
-		LoggingLevel:       defaultFromList(constant.AllLogLevels()),
-		KeycloakSA:         defaultBoolList("Yes", "No"),
-		CustomPanicHandler: defaultBoolList("Yes", "No"),
-		Godotenv:           defaultBoolList("Yes", "No"),
-		Dockerfile:         defaultBoolList("Yes", "No"),
+		LoggingDefault:     defaultBoolList("Yes", "No", "Use the default logging configuration?"),
+		LoggingNested:      defaultBoolList("Nested", "Structured", "Use nested logging?"),
+		LoggingLevel:       defaultFromList(constant.AllLogLevels(), "Select the default logging level"),
+		KeycloakSA:         defaultBoolList("Yes", "No", "Use keycloak service authentication?"),
+		CustomPanicHandler: defaultBoolList("Yes", "No", "Create a custom panic handler?"),
+		Godotenv:           defaultBoolList("Yes", "No", "Use Godotenv?"),
+		Dockerfile:         defaultBoolList("Yes", "No", "Create a optimized dockerfile?"),
 	}
 }
 
