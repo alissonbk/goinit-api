@@ -2,6 +2,8 @@ package tui
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/alissonbk/goinit-api/constant"
 	"github.com/alissonbk/goinit-api/utils"
@@ -30,6 +32,7 @@ const (
 	hotPink                 = lipgloss.Color("#FF06B7")
 	darkGray                = lipgloss.Color("#767676")
 	blue                    = lipgloss.Color("#0090FF")
+	red                     = lipgloss.Color("#CC3000")
 	projectNamePage         = 0
 	httpLibraryPage         = 1
 	projectStructurePage    = 2
@@ -62,6 +65,8 @@ var inputStyle = lipgloss.NewStyle().Foreground(hotPink)
 var listTitleStyle = lipgloss.NewStyle().PaddingLeft(1).PaddingRight(1).Background(blue)
 
 var grayStyle = lipgloss.NewStyle().Foreground(darkGray)
+
+var errorStyle = lipgloss.NewStyle().Foreground(red)
 
 var _ tea.Model = (*TuiModel)(nil)
 
@@ -100,7 +105,7 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case tea.KeyEnter:
 			// FIXME: do a better checking
-			if m.form.projectName.Value() == "" {
+			if strings.Trim(m.form.projectName.Value(), " ") == "" {
 				m.err = fmt.Errorf("please inform a project name")
 				return m, nil
 			}
@@ -112,10 +117,21 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case tea.KeyCtrlC:
 			return m, tea.Quit
-
 		}
 
 		m.form.projectName.Focus()
+
+		switch msg.String() {
+		case "y":
+			if m.currentPage == _endPage {
+				panic("program ended sucessfully")
+			}
+		case "n":
+			if m.currentPage == _endPage {
+				m.currentPage = 0
+			}
+		}
+
 	case error:
 		fmt.Println("reached an error, ", msg)
 		m.err = msg
@@ -126,7 +142,6 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		for i := 1; i < _endPage; i++ {
 			m.form.updateListModelSizeByReflectionIndex(i, msg.Width-h*3, msg.Height-v*3)
-
 		}
 
 	}
@@ -206,9 +221,17 @@ func (m TuiModel) renderListViewByIndex(idx int) string {
 		grayStyle.Render("press ctrl+c to quit."))
 }
 
+func (m TuiModel) renderError() string {
+	if m.err != nil {
+		return errorStyle.Render(m.err.Error())
+	}
+
+	return ""
+}
+
 func (m TuiModel) View() string {
 	if m.currentPage > _endPage {
-		return fmt.Sprintf("end")
+		panic("current page bigger than _endPage " + strconv.Itoa(_endPage))
 	}
 	if m.currentPage == 0 {
 		return fmt.Sprintf(`
@@ -216,11 +239,13 @@ func (m TuiModel) View() string {
 		%s
 
 
+		%s
 
 		%s
 		`,
 			inputStyle.Bold(true).Width(30).Render("Project Name"),
 			inputStyle.Render(m.form.projectName.View()),
+			m.renderError(),
 			grayStyle.Render("press ctrl+c to quit."))
 	}
 
@@ -233,9 +258,34 @@ func (m TuiModel) View() string {
 	
 		Project name: %s
 		Http library: %s
-	`,
+		Project structure: %s
+		Database queries: %s
+		Database driver: %s
+		Logging: %s	
+		LoggingDefault: %s	
+		LoggingNested: %s	
+		LoggingLevel: %s	
+		KeycloakSA: %s	
+		CustomPanicHandler: %s	
+		Godotenv: %s	
+		Dockerfile: %s	
+
+		%s
+		`,
 		inputStyle.Width(30).Render(m.form.projectName.Value()),
 		inputStyle.Width(30).Render(m.form.HttpLibrary.SelectedItem().FilterValue()),
+		inputStyle.Width(30).Render(m.form.ProjectStructure.SelectedItem().FilterValue()),
+		inputStyle.Width(30).Render(m.form.DatabaseQueries.SelectedItem().FilterValue()),
+		inputStyle.Width(30).Render(m.form.DatabaseDriver.SelectedItem().FilterValue()),
+		inputStyle.Width(30).Render(m.form.Logging.SelectedItem().FilterValue()),
+		inputStyle.Width(30).Render(m.form.LoggingDefault.SelectedItem().FilterValue()),
+		inputStyle.Width(30).Render(m.form.LoggingNested.SelectedItem().FilterValue()),
+		inputStyle.Width(30).Render(m.form.LoggingLevel.SelectedItem().FilterValue()),
+		inputStyle.Width(30).Render(m.form.KeycloakSA.SelectedItem().FilterValue()),
+		inputStyle.Width(30).Render(m.form.CustomPanicHandler.SelectedItem().FilterValue()),
+		inputStyle.Width(30).Render(m.form.Godotenv.SelectedItem().FilterValue()),
+		inputStyle.Width(30).Render(m.form.Dockerfile.SelectedItem().FilterValue()),
+		grayStyle.Render("Confirm? (y/n)"),
 	)
 
 }
