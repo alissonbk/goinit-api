@@ -1,0 +1,19 @@
+package codegen
+
+import "fmt"
+
+func GenerateEnv() string {
+	return fmt.Sprintf(`
+		PORT=5000
+		APPLICATION_NAME=restful-template-api
+		DB_DSN="host=localhost user=postgres password=1234 dbname=go_rest_template port=5432 sslmode=disable"
+		DB_MAX_OPEN_CONN=20
+		DB_MAX_IDLE_CONN=10
+		##### { PROD, DEV, INFO, WARN, ERROR, SILENT } ######
+		DB_LOG_LEVEL=DEV
+		##### { DEBUG, TRACE } #####
+		LOG_LEVEL=DEBUG
+		##### { JSON, NESTED } #####
+		LOG_TYPE=NESTED
+	`)
+}
