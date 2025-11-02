@@ -121,11 +121,11 @@ func (l LoggingOptions) ToString() string {
 type LogLevel uint8
 
 const (
-	PROD LogLevel = iota
-	DEV
+	DEBUG = iota
 	INFO
 	WARN
 	ERROR
+	FATAL
 	SILENT
 	_endLogLevel
 )
@@ -142,16 +142,16 @@ func AllLogLevels() []string {
 
 func (l LogLevel) ToString() string {
 	switch l {
-	case PROD:
-		return "PROD"
-	case DEV:
-		return "DEV"
+	case DEBUG:
+		return "DEBUG"
 	case INFO:
 		return "INFO"
 	case WARN:
 		return "WARN"
 	case ERROR:
 		return "ERROR"
+	case FATAL:
+		return "FATAL"
 	case SILENT:
 		return "SILENT"
 	default:

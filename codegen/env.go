@@ -2,7 +2,7 @@ package codegen
 
 import "fmt"
 
-func GenerateEnv() string {
+func GenerateEnvContent() string {
 	return fmt.Sprintf(`
 		PORT=5000
 		APPLICATION_NAME=restful-template-api

@@ -2,7 +2,7 @@ package codegen
 
 import "fmt"
 
-func GenerateDockerfile() string {
+func GenerateDockerfileContent() string {
 	return fmt.Sprintf(`
 		FROM golang:1.22.5-alpine AS golang
 
@@ -34,7 +34,7 @@ func GenerateDockerfile() string {
 	`)
 }
 
-func GenerateDockerCompose() string {
+func GenerateDockerComposeContent() string {
 	return fmt.Sprintf(`
 		services:
 			api:

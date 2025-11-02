@@ -6,7 +6,7 @@ import (
 	"github.com/alissonbk/goinit-api/constant"
 )
 
-func GenerateRepository(databaseQueries constant.DatabaseQueries) string {
+func GenerateRepositoryContent(databaseQueries constant.DatabaseQueries) string {
 	if databaseQueries == constant.GORM {
 		return fmt.Sprintf(`
 			package repository

@@ -6,7 +6,7 @@ import (
 	"github.com/alissonbk/goinit-api/constant"
 )
 
-func GenerateRouterFileContent(lib constant.HttpLibrary) string {
+func GenerateRouterContent(lib constant.HttpLibrary) string {
 	switch lib {
 	case constant.Gin:
 		return fmt.Sprintf(`
