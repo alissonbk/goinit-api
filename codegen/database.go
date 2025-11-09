@@ -6,7 +6,7 @@ import (
 	"github.com/alissonbk/goinit-api/constant"
 )
 
-func GenerateDatabaseContent(databaseDriver string, databaseQueries constant.DatabaseQueries, godotenv bool, logLevel constant.LogLevel) string {
+func GenerateDatabaseContent(databaseDriver constant.DatabaseDriver, databaseQueries constant.DatabaseQueries, godotenv bool, logLevel constant.LogLevel) string {
 
 	dsnInfo := func() string {
 		if godotenv {
@@ -37,6 +37,18 @@ func GenerateDatabaseContent(databaseDriver string, databaseQueries constant.Dat
 		return logLevel.ToString()
 	}()
 
+	importMigrateDatabaseDriver := func() string {
+		if databaseDriver == constant.PGX {
+			return "github.com/golang-migrate/migrate/v4/database/pgx/v5"
+		}
+
+		if databaseDriver == constant.Mssql {
+			return "github.com/golang-migrate/migrate/v4/database/sqlserver"
+		}
+
+		return fmt.Sprintf("github.com/golang-migrate/migrate/v4/database/%s", databaseDriver.ToString())
+	}()
+
 	if databaseQueries == constant.Sqlx {
 		return fmt.Sprintf(`
 			package config
@@ -46,10 +58,10 @@ func GenerateDatabaseContent(databaseDriver string, databaseQueries constant.Dat
 				"strings"
 
 				"github.com/golang-migrate/migrate/v4"
-				"github.com/golang-migrate/migrate/v4/database/%[1]s"	
+				"%[3]s"	
 				_ "github.com/golang-migrate/migrate/v4/source/file"
 				"github.com/jmoiron/sqlx"
-				_ "github.com/lib/pq"
+				_ %[4]s
 				"github.com/sirupsen/logrus"
 
 				"os"
@@ -129,7 +141,7 @@ func GenerateDatabaseContent(databaseDriver string, databaseQueries constant.Dat
 				logrus.Info("migrations ran sucessfully")
 			}
 
-		`, databaseDriver, dsnInfo)
+		`, databaseDriver.ToString(), dsnInfo, importMigrateDatabaseDriver, GetDatabaseDriverDependencies(databaseDriver))
 	}
 
 	if databaseQueries == constant.GORM {
@@ -220,8 +232,27 @@ func GenerateDatabaseContent(databaseDriver string, databaseQueries constant.Dat
 				)
 			}
 
-		`, databaseDriver, dsnInfo, logLevelInfo)
+		`, databaseDriver.ToString(), dsnInfo, logLevelInfo)
 	}
 
 	panic("invalid database queries option")
+}
+
+func GetDatabaseDriverDependencies(dbDriver constant.DatabaseDriver) string {
+	switch dbDriver {
+	case constant.Clickhouse:
+		return "github.com/ClickHouse/clickhouse-go"
+	case constant.PGX:
+		return "github.com/jackc/pgx"
+	case constant.MySQL:
+		return "github.com/go-sql-driver/mysql"
+	case constant.Mssql:
+		return "github.com/denisenkom/go-mssqldb"
+	case constant.Postgres:
+		return "github.com/lib/pq"
+	case constant.Sqlite3:
+		return "github.com/mattn/go-sqlite3"
+	default:
+		panic("invalid db driver")
+	}
 }

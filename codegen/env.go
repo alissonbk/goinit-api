@@ -2,6 +2,7 @@ package codegen
 
 import "fmt"
 
+// TODO: add DSNS for every driver e.g click house= DB_DSN="clickhouse://default:@localhost:9000/go_rest_template"
 func GenerateEnvContent() string {
 	return fmt.Sprintf(`
 		PORT=5000

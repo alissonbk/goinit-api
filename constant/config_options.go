@@ -66,7 +66,6 @@ const (
 	Sqlite3
 	Mssql
 	Clickhouse
-	Oci8
 	_endDatabaseDriver
 )
 
@@ -84,8 +83,6 @@ func (d DatabaseDriver) ToString() string {
 		return "mssql"
 	case Clickhouse:
 		return "clickhouse"
-	case Oci8:
-		return "oci8"
 	default:
 		return "unknown"
 	}
