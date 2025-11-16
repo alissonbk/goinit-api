@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"github.com/alissonbk/goinit-api/constant"
+	"github.com/alissonbk/goinit-api/model"
 )
 
-func GenereateDependenciesList(dbDriver constant.DatabaseDriver, httpLibrary constant.HttpLibrary,
-	dbQueries constant.DatabaseQueries, godotenv bool, logs constant.LoggingOptions) string {
+func GenereateDependenciesList(cfg model.Configuration) string {
 
 	httpLibDependency := func() string {
-		switch httpLibrary {
+		switch cfg.HttpLibrary {
 		case constant.Echo:
 			return "github.com/labstack/echo"
 		case constant.Fiber:
@@ -23,9 +23,9 @@ func GenereateDependenciesList(dbDriver constant.DatabaseDriver, httpLibrary con
 	}()
 
 	dbQueriesDeps := func() string {
-		switch dbQueries {
+		switch cfg.DatabaseQueries {
 		case constant.GORM:
-			return fmt.Sprintf("gorm.io/driver/%s gorm.io/gorm", dbDriver.ToString())
+			return fmt.Sprintf("gorm.io/driver/%s gorm.io/gorm", cfg.DatabaseDriver.ToString())
 		case constant.Sqlx:
 			return "github.com/golang-migrate/migrate/v4 github.com/jmoiron/sqlx "
 		default:
@@ -34,14 +34,14 @@ func GenereateDependenciesList(dbDriver constant.DatabaseDriver, httpLibrary con
 	}()
 
 	dotenvDeps := func() string {
-		if godotenv {
+		if cfg.GodotEnv {
 			return "github.com/joho/godotenv"
 		}
 		return ""
 	}()
 
 	logsDeps := func() string {
-		switch logs {
+		switch cfg.Logging.Option {
 		case constant.Logrus:
 			return `
 				github.com/antonfisher/nested-logrus-formatter
@@ -60,6 +60,5 @@ func GenereateDependenciesList(dbDriver constant.DatabaseDriver, httpLibrary con
 		%s		
 		%s		
 		%s
-		
-	`, httpLibDependency, dbQueriesDeps, GetDatabaseDriverDependencies(dbDriver), dotenvDeps, logsDeps)
+	`, httpLibDependency, dbQueriesDeps, GetDatabaseDriverDependencies(cfg.DatabaseDriver), dotenvDeps, logsDeps)
 }

@@ -5,28 +5,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/alissonbk/goinit-api/constant"
+	"github.com/alissonbk/goinit-api/filegen"
+	"github.com/alissonbk/goinit-api/model"
 	"github.com/alissonbk/goinit-api/utils"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
-
-type Configuration struct {
-	ProjectName      string
-	HttpLibrary      constant.HttpLibrary
-	ProjectStructure constant.ProjectStructure
-	DatabaseQueries  constant.DatabaseQueries
-	DatabaseDriver   constant.DatabaseDriver
-	Logging          struct {
-		Option     constant.LoggingOptions
-		Structured bool
-		Loglevel   constant.LogLevel
-	}
-	KeycloakServiceAuth bool
-	CustomPanicHandler  bool
-	GodotEnv            bool
-	Dockerfile          bool
-}
 
 const (
 	hotPink                 = lipgloss.Color("#FF06B7")
@@ -74,7 +58,7 @@ type TuiModel struct {
 	currentPage   int
 	form          *form
 	err           error
-	configuration Configuration
+	configuration model.Configuration
 	selected      map[int]uint8 // uint8 will be any constant type also works for y/n case
 }
 
@@ -124,7 +108,7 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "y":
 			if m.currentPage == _endPage {
-				panic("program ended sucessfully")
+				filegen.GenereateProject(m.configuration)
 			}
 		case "n":
 			if m.currentPage == _endPage {
