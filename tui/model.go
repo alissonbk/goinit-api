@@ -77,7 +77,8 @@ func (m TuiModel) Init() tea.Cmd {
 func (m TuiModel) updateListModel(msg tea.Msg, attributeIndex int) (TuiModel, tea.Cmd) {
 	reflectedAttribute := m.form.getAttributeByReflectionIndex(attributeIndex)
 	m2, cmd := reflectedAttribute.Update(msg)
-	m.form.setAttributeByReflectionIndex(attributeIndex, &m2)
+	m.form.setFormAttributeByReflectionIndex(attributeIndex, &m2)
+
 	(reflectedAttribute).ResetSelected()
 	return m, tea.Batch([]tea.Cmd{cmd}...)
 }
@@ -108,6 +109,7 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "y":
 			if m.currentPage == _endPage {
+				fmt.Println(m.form)
 				filegen.GenereateProject(m.configuration)
 			}
 		case "n":
@@ -133,6 +135,7 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.currentPage == projectNamePage {
 		m2, cmd := m.form.projectName.Update(msg)
 		m.form.projectName = m2
+		m.configuration.ProjectName = m2.Value()
 		return m, tea.Batch([]tea.Cmd{cmd}...)
 	}
 

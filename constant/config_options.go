@@ -21,6 +21,19 @@ func (hl HttpLibrary) ToString() string {
 	}
 }
 
+func HttpLibraryFromString(s string) HttpLibrary {
+	switch s {
+	case "Gin":
+		return Gin
+	case "Fiber":
+		return Fiber
+	case "Echo":
+		return Echo
+	default:
+		panic("invalid http library string")
+	}
+}
+
 type ProjectStructure uint8
 
 const (

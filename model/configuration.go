@@ -1,10 +1,13 @@
 package model
 
-import "github.com/alissonbk/goinit-api/constant"
+import (
+	"github.com/alissonbk/goinit-api/constant"
+	"github.com/charmbracelet/bubbles/list"
+)
 
 type Configuration struct {
-	ProjectName      string
 	ModuleName       string
+	ProjectName      string
 	HttpLibrary      constant.HttpLibrary
 	ProjectStructure constant.ProjectStructure
 	DatabaseQueries  constant.DatabaseQueries
@@ -18,4 +21,12 @@ type Configuration struct {
 	CustomPanicHandler  bool
 	GodotEnv            bool
 	Dockerfile          bool
+}
+
+func (c *Configuration) setProjectNameByList(v *list.Model) {
+	c.ProjectName = v.Title
+}
+
+func (c *Configuration) setHttpLibrary(v *list.Model) {
+	c.HttpLibrary = constant.HttpLibraryFromString(v.Title)
 }

@@ -48,7 +48,7 @@ func (f *form) getAttributeByReflectionIndex(index int) *list.Model {
 
 }
 
-func (f *form) setAttributeByReflectionIndex(idx int, newValue any) {
+func (f *form) setFormAttributeByReflectionIndex(idx int, newValue any) {
 	v := reflect.ValueOf(f).Elem()
 	if idx < 0 || idx >= v.NumField() {
 		panic("invalid field index")
