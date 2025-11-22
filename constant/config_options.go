@@ -52,6 +52,17 @@ func (hl ProjectStructure) ToString() string {
 	}
 }
 
+func ProjectStructureFromString(s string) ProjectStructure {
+	switch s {
+	case "MVC":
+		return MVC
+	case "Hexagonal":
+		return Hexagonal
+	default:
+		panic("invalid string for project structure")
+	}
+}
+
 type DatabaseQueries uint8
 
 const (
@@ -67,6 +78,17 @@ func (dq DatabaseQueries) ToString() string {
 		return "Sqlx"
 	default:
 		return "unknown"
+	}
+}
+
+func DatbaseQueriesFromString(s string) DatabaseQueries {
+	switch s {
+	case "GORM":
+		return GORM
+	case "Sqlx":
+		return Sqlx
+	default:
+		panic("invalid database query")
 	}
 }
 
@@ -98,6 +120,25 @@ func (d DatabaseDriver) ToString() string {
 		return "clickhouse"
 	default:
 		return "unknown"
+	}
+}
+
+func DatabaseDriverFromString(s string) DatabaseDriver {
+	switch s {
+	case "postgres":
+		return Postgres
+	case "pgx":
+		return PGX
+	case "mysql":
+		return MySQL
+	case "sqlite3":
+		return Sqlite3
+	case "mssql":
+		return Mssql
+	case "clickhouse":
+		return Clickhouse
+	default:
+		panic("invalid database driver string")
 	}
 }
 
@@ -166,5 +207,24 @@ func (l LogLevel) ToString() string {
 		return "SILENT"
 	default:
 		return "UNKNOWN"
+	}
+}
+
+func LogLevelFromString(s string) LogLevel {
+	switch s {
+	case "DEBUG":
+		return DEBUG
+	case "INFO":
+		return INFO
+	case "WARN":
+		return WARN
+	case "ERROR":
+		return ERROR
+	case "FATAL":
+		return FATAL
+	case "SILENT":
+		return SILENT
+	default:
+		panic("invalid loglevel string")
 	}
 }
