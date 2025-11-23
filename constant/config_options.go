@@ -1,5 +1,7 @@
 package constant
 
+import "strings"
+
 type HttpLibrary uint8
 
 const (
@@ -81,7 +83,7 @@ func (dq DatabaseQueries) ToString() string {
 	}
 }
 
-func DatbaseQueriesFromString(s string) DatabaseQueries {
+func DatabaseQueriesFromString(s string) DatabaseQueries {
 	switch s {
 	case "GORM":
 		return GORM
@@ -167,6 +169,33 @@ func (l LoggingOptions) ToString() string {
 	default:
 		return "unknown"
 	}
+}
+
+func LoggingOptionsFromString(s string) LoggingOptions {
+	switch s {
+	case "zap":
+		return Zap
+	case "logrus":
+		return Logrus
+	default:
+		panic("invalid logging options from string")
+	}
+
+}
+
+func LoggingNestedFromString(s string) bool {
+	if strings.ToLower(s) == "nested" {
+		return true
+	}
+	return false
+}
+
+func BooleanOptionFromString(s string) bool {
+	if strings.ToLower(s) == "yes" {
+		return true
+	}
+
+	return false
 }
 
 type LogLevel uint8

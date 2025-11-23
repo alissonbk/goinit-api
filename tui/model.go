@@ -140,51 +140,76 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	if m.currentPage == httpLibraryPage {
-		return m.updateListModel(msg, httpLibraryPage)
+		newModel, cmd := m.updateListModel(msg, httpLibraryPage)
+		m.configuration.SetHttpLibrary(newModel.form.HttpLibrary)
+		return newModel, cmd
 	}
 
 	if m.currentPage == projectStructurePage {
-		return m.updateListModel(msg, projectStructurePage)
+		newModel, cmd := m.updateListModel(msg, projectStructurePage)
+		m.configuration.SetProjectStructure(newModel.form.ProjectStructure)
+		return newModel, cmd
 	}
 
 	if m.currentPage == databaseQueriesPage {
-		return m.updateListModel(msg, databaseQueriesPage)
+		newModel, cmd := m.updateListModel(msg, databaseQueriesPage)
+		m.configuration.SetDatabaseQueries(newModel.form.DatabaseQueries)
+		return newModel, cmd
 	}
 
 	if m.currentPage == databaseDriverPage {
-		return m.updateListModel(msg, databaseDriverPage)
+		newModel, cmd := m.updateListModel(msg, databaseDriverPage)
+		m.configuration.SetDatabaseDriver(newModel.form.DatabaseDriver)
+		return newModel, cmd
 	}
 
 	if m.currentPage == loggingPage {
-		return m.updateListModel(msg, loggingPage)
+		newModel, cmd := m.updateListModel(msg, loggingPage)
+		m.configuration.SetLoggingOption(newModel.form.Logging)
+		return newModel, cmd
 	}
 
 	if m.currentPage == loggingDefaultPage {
-		return m.updateListModel(msg, loggingDefaultPage)
+		m.updateListModel(msg, loggingDefaultPage)
+		// newModel, cmd := m.updateListModel(msg, loggingDefaultPage)
+		// m.configuration.SetLogg(newModel.form.LoggingDefault)
+		// return newModel, cmd
 	}
 
 	if m.currentPage == loggingNestedPage {
-		return m.updateListModel(msg, loggingNestedPage)
+		newModel, cmd := m.updateListModel(msg, loggingNestedPage)
+		m.configuration.SetLoggingNested(newModel.form.LoggingNested)
+		return newModel, cmd
 	}
 
 	if m.currentPage == loggingLevelPage {
-		return m.updateListModel(msg, loggingLevelPage)
+		newModel, cmd := m.updateListModel(msg, loggingLevelPage)
+		m.configuration.SetLoggingLevel(newModel.form.LoggingLevel)
+		return newModel, cmd
 	}
 
 	if m.currentPage == keycloakServiceAuthPage {
-		return m.updateListModel(msg, keycloakServiceAuthPage)
+		newModel, cmd := m.updateListModel(msg, keycloakServiceAuthPage)
+		m.configuration.SetKeycloakServiceAuth(newModel.form.KeycloakSA)
+		return newModel, cmd
 	}
 
 	if m.currentPage == customPanicHandlerPage {
-		return m.updateListModel(msg, customPanicHandlerPage)
+		newModel, cmd := m.updateListModel(msg, customPanicHandlerPage)
+		m.configuration.SetCustomPanicHandler(newModel.form.CustomPanicHandler)
+		return newModel, cmd
 	}
 
 	if m.currentPage == godotEnvPage {
-		return m.updateListModel(msg, godotEnvPage)
+		newModel, cmd := m.updateListModel(msg, godotEnvPage)
+		m.configuration.SetGodotEnv(newModel.form.Godotenv)
+		return newModel, cmd
 	}
 
 	if m.currentPage == dockerfilePage {
-		return m.updateListModel(msg, dockerfilePage)
+		newModel, cmd := m.updateListModel(msg, dockerfilePage)
+		m.configuration.SetDockerfile(newModel.form.Dockerfile)
+		return newModel, cmd
 	}
 
 	if m.currentPage == _endPage {
