@@ -32,7 +32,7 @@ func HttpLibraryFromString(s string) HttpLibrary {
 	case "Echo":
 		return Echo
 	default:
-		panic("invalid http library string")
+		panic("invalid http library string " + s)
 	}
 }
 
@@ -61,7 +61,7 @@ func ProjectStructureFromString(s string) ProjectStructure {
 	case "Hexagonal":
 		return Hexagonal
 	default:
-		panic("invalid string for project structure")
+		panic("invalid string for project structure " + s)
 	}
 }
 
@@ -90,7 +90,7 @@ func DatabaseQueriesFromString(s string) DatabaseQueries {
 	case "Sqlx":
 		return Sqlx
 	default:
-		panic("invalid database query")
+		panic("invalid database query " + s)
 	}
 }
 
@@ -140,7 +140,7 @@ func DatabaseDriverFromString(s string) DatabaseDriver {
 	case "clickhouse":
 		return Clickhouse
 	default:
-		panic("invalid database driver string")
+		panic("invalid database driver string " + s)
 	}
 }
 
@@ -178,7 +178,7 @@ func LoggingOptionsFromString(s string) LoggingOptions {
 	case "logrus":
 		return Logrus
 	default:
-		panic("invalid logging options from string")
+		panic("invalid logging options from string " + s)
 	}
 
 }

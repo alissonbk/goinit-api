@@ -83,6 +83,61 @@ func (m TuiModel) updateListModel(msg tea.Msg, attributeIndex int) (TuiModel, te
 	return m, tea.Batch([]tea.Cmd{cmd}...)
 }
 
+func (m TuiModel) updateConfigOption() {
+	if m.currentPage == projectNamePage {
+		m.configuration.SetProjectName(m.form.projectName.Prompt)
+	}
+
+	if m.currentPage == httpLibraryPage {
+		m.configuration.SetHttpLibrary(m.form.HttpLibrary)
+	}
+
+	if m.currentPage == projectStructurePage {
+		m.configuration.SetProjectStructure(m.form.ProjectStructure)
+	}
+
+	if m.currentPage == databaseQueriesPage {
+		m.configuration.SetDatabaseQueries(m.form.DatabaseQueries)
+	}
+
+	if m.currentPage == databaseDriverPage {
+		m.configuration.SetDatabaseDriver(m.form.DatabaseDriver)
+	}
+
+	if m.currentPage == loggingPage {
+		m.configuration.SetLoggingOption(m.form.Logging)
+	}
+
+	if m.currentPage == loggingDefaultPage {
+		// m.configuration.SetLoggingLevel()
+	}
+
+	if m.currentPage == loggingNestedPage {
+		m.configuration.SetLoggingNested(m.form.LoggingNested)
+	}
+
+	if m.currentPage == loggingLevelPage {
+		m.configuration.SetLoggingNested(m.form.LoggingLevel)
+	}
+
+	if m.currentPage == keycloakServiceAuthPage {
+		m.configuration.SetLoggingNested(m.form.KeycloakSA)
+	}
+
+	if m.currentPage == customPanicHandlerPage {
+		m.configuration.SetLoggingNested(m.form.CustomPanicHandler)
+	}
+
+	if m.currentPage == godotEnvPage {
+		m.configuration.SetLoggingNested(m.form.Godotenv)
+	}
+
+	if m.currentPage == dockerfilePage {
+		m.configuration.SetLoggingNested(m.form.Dockerfile)
+	}
+
+}
+
 func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -94,6 +149,7 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.err = fmt.Errorf("please inform a project name")
 				return m, nil
 			}
+			m.updateConfigOption()
 			m.currentPage += 1
 			// FIXME: remove this page rounding
 			if m.currentPage > _endPage {
@@ -141,7 +197,9 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	if m.currentPage == httpLibraryPage {
 		newModel, cmd := m.updateListModel(msg, httpLibraryPage)
-		m.configuration.SetHttpLibrary(newModel.form.HttpLibrary)
+		if newModel.form.HttpLibrary != nil {
+
+		}
 		return newModel, cmd
 	}
 
