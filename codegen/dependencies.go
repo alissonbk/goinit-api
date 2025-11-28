@@ -54,11 +54,5 @@ func GenereateDependenciesList(cfg model.Configuration) string {
 		}
 	}()
 
-	return fmt.Sprintf(` 			
-		%s
-		%s		
-		%s		
-		%s		
-		%s
-	`, httpLibDependency, dbQueriesDeps, GetDatabaseDriverDependencies(cfg.DatabaseDriver), dotenvDeps, logsDeps)
+	return fmt.Sprintf("%s %s %s %s %s", httpLibDependency, dbQueriesDeps, GetDatabaseDriverDependencies(cfg.DatabaseDriver), dotenvDeps, logsDeps)
 }

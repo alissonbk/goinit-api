@@ -117,23 +117,23 @@ func (m TuiModel) updateConfigOption() {
 	}
 
 	if m.currentPage == loggingLevelPage {
-		m.configuration.SetLoggingNested(m.form.LoggingLevel)
+		m.configuration.SetLoggingLevel(m.form.LoggingLevel)
 	}
 
 	if m.currentPage == keycloakServiceAuthPage {
-		m.configuration.SetLoggingNested(m.form.KeycloakSA)
+		m.configuration.SetKeycloakServiceAuth(m.form.KeycloakSA)
 	}
 
 	if m.currentPage == customPanicHandlerPage {
-		m.configuration.SetLoggingNested(m.form.CustomPanicHandler)
+		m.configuration.SetCustomPanicHandler(m.form.CustomPanicHandler)
 	}
 
 	if m.currentPage == godotEnvPage {
-		m.configuration.SetLoggingNested(m.form.Godotenv)
+		m.configuration.SetGodotEnv(m.form.Godotenv)
 	}
 
 	if m.currentPage == dockerfilePage {
-		m.configuration.SetLoggingNested(m.form.Dockerfile)
+		m.configuration.SetDockerfile(m.form.Dockerfile)
 	}
 
 }
@@ -228,7 +228,7 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	if m.currentPage == loggingDefaultPage {
-		m.updateListModel(msg, loggingDefaultPage)
+		return m.updateListModel(msg, loggingDefaultPage)
 		// newModel, cmd := m.updateListModel(msg, loggingDefaultPage)
 		// m.configuration.SetLogg(newModel.form.LoggingDefault)
 		// return newModel, cmd
@@ -274,7 +274,7 @@ func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	panic("didn't match any page")
+	panic(fmt.Sprintf("didn't match any page : %d\n", m.currentPage))
 }
 
 func (m TuiModel) renderListViewByIndex(idx int) string {

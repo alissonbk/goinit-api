@@ -84,10 +84,10 @@ func (dq DatabaseQueries) ToString() string {
 }
 
 func DatabaseQueriesFromString(s string) DatabaseQueries {
-	switch s {
-	case "GORM":
+	switch strings.ToLower(s) {
+	case "gorm":
 		return GORM
-	case "Sqlx":
+	case "sqlx":
 		return Sqlx
 	default:
 		panic("invalid database query " + s)
@@ -172,8 +172,8 @@ func (l LoggingOptions) ToString() string {
 }
 
 func LoggingOptionsFromString(s string) LoggingOptions {
-	switch s {
-	case "zap":
+	switch strings.ToLower(s) {
+	case "uber/zap":
 		return Zap
 	case "logrus":
 		return Logrus
