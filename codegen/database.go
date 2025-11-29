@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"github.com/alissonbk/goinit-api/constant"
+	"github.com/alissonbk/goinit-api/model"
 )
 
-func GenerateDatabaseContent(databaseDriver constant.DatabaseDriver, databaseQueries constant.DatabaseQueries, godotenv bool, logLevel constant.LogLevel) string {
+func GenerateDatabaseContent(cfg model.Configuration) string {
 
 	dsnInfo := func() string {
-		if godotenv {
+		if cfg.GodotEnv {
 			return `				
 				dsn := os.Getenv("DB_DSN")
 				maxOpen, err := strconv.Atoi(os.Getenv("DB_MAX_OPEN_CONN"))
@@ -30,26 +31,26 @@ func GenerateDatabaseContent(databaseDriver constant.DatabaseDriver, databaseQue
 	}()
 
 	logLevelInfo := func() string {
-		if godotenv {
+		if cfg.GodotEnv {
 			return `os.Getenv("DB_LOG_LEVEL")`
 		}
 
-		return logLevel.ToString()
+		return cfg.Logging.Loglevel.ToString()
 	}()
 
 	importMigrateDatabaseDriver := func() string {
-		if databaseDriver == constant.PGX {
+		if cfg.DatabaseDriver == constant.PGX {
 			return "github.com/golang-migrate/migrate/v4/database/pgx/v5"
 		}
 
-		if databaseDriver == constant.Mssql {
+		if cfg.DatabaseDriver == constant.Mssql {
 			return "github.com/golang-migrate/migrate/v4/database/sqlserver"
 		}
 
-		return fmt.Sprintf("github.com/golang-migrate/migrate/v4/database/%s", databaseDriver.ToString())
+		return fmt.Sprintf("github.com/golang-migrate/migrate/v4/database/%s", cfg.DatabaseDriver.ToString())
 	}()
 
-	if databaseQueries == constant.Sqlx {
+	if cfg.DatabaseQueries == constant.Sqlx {
 		return fmt.Sprintf(`
 			package config
 
@@ -141,10 +142,10 @@ func GenerateDatabaseContent(databaseDriver constant.DatabaseDriver, databaseQue
 				logrus.Info("migrations ran sucessfully")
 			}
 
-		`, databaseDriver.ToString(), dsnInfo, importMigrateDatabaseDriver, GetDatabaseDriverDependencies(databaseDriver))
+		`, cfg.DatabaseDriver.ToString(), dsnInfo, importMigrateDatabaseDriver, GetDatabaseDriverDependencies(cfg.DatabaseDriver))
 	}
 
-	if databaseQueries == constant.GORM {
+	if cfg.DatabaseQueries == constant.GORM {
 		return fmt.Sprintf(`
 			package config
 
@@ -232,7 +233,7 @@ func GenerateDatabaseContent(databaseDriver constant.DatabaseDriver, databaseQue
 				)
 			}
 
-		`, databaseDriver.ToString(), dsnInfo, logLevelInfo)
+		`, cfg.DatabaseDriver.ToString(), dsnInfo, logLevelInfo)
 	}
 
 	panic("invalid database queries option")

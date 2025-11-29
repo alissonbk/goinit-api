@@ -4,15 +4,16 @@ import (
 	"fmt"
 
 	"github.com/alissonbk/goinit-api/constant"
+	"github.com/alissonbk/goinit-api/model"
 )
 
-func GenerateLogsContent(logOption constant.LoggingOptions, logLevel constant.LogLevel, structured bool) string {
-	if logOption == constant.Logrus {
-		return generateLogrusLogsContent(logLevel, structured)
+func GenerateLogsContent(cfg model.Configuration) string {
+	if cfg.Logging.Option == constant.Logrus {
+		return generateLogrusLogsContent(cfg.Logging.Loglevel, cfg.Logging.Structured)
 	}
 
-	if logOption == constant.Zap {
-		return generateZapLogsContent(logLevel, structured)
+	if cfg.Logging.Option == constant.Zap {
+		return generateZapLogsContent(cfg.Logging.Loglevel, cfg.Logging.Structured)
 	}
 
 	panic("invalid log option")

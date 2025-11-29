@@ -2,6 +2,7 @@ package codegen
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/alissonbk/goinit-api/constant"
 	"github.com/alissonbk/goinit-api/model"
@@ -35,7 +36,7 @@ func GenereateDependenciesList(cfg model.Configuration) string {
 
 	dotenvDeps := func() string {
 		if cfg.GodotEnv {
-			return "github.com/joho/godotenv"
+			return "github.com/joho/godotenv "
 		}
 		return ""
 	}()
@@ -43,16 +44,28 @@ func GenereateDependenciesList(cfg model.Configuration) string {
 	logsDeps := func() string {
 		switch cfg.Logging.Option {
 		case constant.Logrus:
-			return `
-				github.com/antonfisher/nested-logrus-formatter
-				github.com/sirupsen/logrus
-			`
+			return "github.com/antonfisher/nested-logrus-formatter github.com/sirupsen/logrus"
 		case constant.Zap:
-			return `github.com/uber-go/zap`
+			return "go.uber.org/zap"
 		default:
 			panic("invalid log option")
 		}
 	}()
 
-	return fmt.Sprintf("%s %s %s %s %s", httpLibDependency, dbQueriesDeps, GetDatabaseDriverDependencies(cfg.DatabaseDriver), dotenvDeps, logsDeps)
+	return formatDepsList(httpLibDependency, dbQueriesDeps, GetDatabaseDriverDependencies(cfg.DatabaseDriver), dotenvDeps, logsDeps)
+}
+
+func formatDepsList(deps ...string) string {
+	s := strings.Builder{}
+	for idx, d := range deps {
+		if strings.Trim(d, " ") != "" {
+			if idx == len(deps)-1 {
+				s.WriteString(d)
+				break
+			}
+			s.WriteString(d + " ")
+		}
+	}
+
+	return s.String()
 }
