@@ -9,7 +9,18 @@ import (
 	"github.com/alissonbk/goinit-api/model"
 )
 
+const (
+	DIR_PERM  = 0755
+	FILE_PERM = 0644
+)
+
 // TODO return error message instead of panicking
+func writeFile(filename, content string) {
+	if err := os.WriteFile(filename, []byte(content), FILE_PERM); err != nil {
+		panic("failed to write " + filename + ": " + err.Error())
+	}
+}
+
 func createProjectFiles(cfg model.Configuration) {
 	if cfg.ProjectStructure == constant.Hexagonal {
 		// TODO
@@ -23,136 +34,87 @@ func createProjectFiles(cfg model.Configuration) {
 		}
 
 		// main.go
-		if mainoutput, err := exec.Command("echo", codegen.GenerateMainContent(cfg), ">", "main.go").Output(); err != nil {
-			panic("failed to write main.go, output: " + string(mainoutput))
-		}
+		writeFile("main.go", codegen.GenerateMainContent(cfg))
 
 		// dockerfile and compose
 		if cfg.Dockerfile {
-			if dockerfileoutput, err := exec.Command("echo", codegen.GenerateDockerfileContent(), ">", "Dockerfile").Output(); err != nil {
-				panic("failed to write dockerfile content, output: " + string(dockerfileoutput))
-			}
-			if composeoutput, err := exec.Command("echo", codegen.GenerateDockerComposeContent(), ">", "docker-compose.yaml").Output(); err != nil {
-				panic("failed to write docker-compose content, output: " + string(composeoutput))
-			}
+			writeFile("Dockerfile", codegen.GenerateDockerfileContent())
+			writeFile("docker-compose.yaml", codegen.GenerateDockerComposeContent())
 		}
 
 		if cfg.GodotEnv {
-			echocmd := exec.Command("echo", codegen.GenerateEnvContent())
-			teecmd := exec.Command("tee", ".env", ".env.example")
-
-			stdoutpipe, err := echocmd.StdoutPipe()
-			if err != nil {
-				panic("failed to get stdout pipe from echo, cause: " + err.Error())
-			}
-			defer stdoutpipe.Close()
-
-			teecmd.Stdin = stdoutpipe
-
-			if err = echocmd.Start(); err != nil {
-				panic("failed to write .env echo cmd: " + err.Error())
-			}
-
-			if output, err := teecmd.CombinedOutput(); err != nil {
-				panic("failed to run tee cmd creating .env output:" + string(output))
-			}
-
-			// maybe should call echocmd.Wait() here or before
-
+			envContent := codegen.GenerateEnvContent()
+			writeFile(".env", envContent)
+			writeFile(".env.example", envContent)
 		}
 
 		// config dir
-		os.Mkdir("config", 0755)
+		os.Mkdir("config", DIR_PERM)
 		if err = os.Chdir("config"); err != nil {
 			panic("failed to change directory: " + err.Error())
 		}
-		if databaseContentOutput, err := exec.Command("echo", codegen.GenerateDatabaseContent(cfg), ">", "database.go").Output(); err != nil {
-			panic("failed to create database content output:" + string(databaseContentOutput))
-		}
-		if logsOutput, err := exec.Command("echo", codegen.GenerateLogsContent(cfg), ">", "logs.go").Output(); err != nil {
-			panic("failed to create logs content output:" + string(logsOutput))
-		}
+		writeFile("database.go", codegen.GenerateDatabaseContent(cfg))
+		writeFile("logs.go", codegen.GenerateLogsContent(cfg))
 
 		// migrations
-		os.Mkdir("migrations", 0755)
-		if migrationUpOutput, err := exec.Command("echo", codegen.GenerateExampleMigrationUpContent(), ">", "migrations/000001_create_example_table.up.sql").Output(); err != nil {
-			panic("failed to create migration up content output:" + string(migrationUpOutput))
-		}
-		if migrationDownOutput, err := exec.Command("echo", codegen.GenerateExampleMigrationDownContent(), ">", "migrations/000001_create_example_table.down.sql").Output(); err != nil {
-			panic("failed to create migration down content output:" + string(migrationDownOutput))
-		}
+		os.Mkdir("migrations", DIR_PERM)
+		writeFile("migrations/000001_create_example_table.up.sql", codegen.GenerateExampleMigrationUpContent())
+		writeFile("migrations/000001_create_example_table.down.sql", codegen.GenerateExampleMigrationDownContent())
 
 		// back to main directory
-		err = os.Chdir("../../")
+		err = os.Chdir("../")
 		if err != nil {
 			panic("failed to change directory: " + err.Error())
 		}
 
 		// app dir
-		os.Mkdir("app", 0755)
+		os.Mkdir("app", DIR_PERM)
 		err = os.Chdir("app")
 		if err != nil {
 			panic("failed to change directory: " + err.Error())
 		}
 
 		// constant
-		os.Mkdir("constant", 0755)
-		if constantOutput, err := exec.Command("echo", codegen.GenerateConstantContent(), ">", "constant/status.go").Output(); err != nil {
-			panic("failed to create constant content output:" + string(constantOutput))
-		}
+		os.Mkdir("constant", DIR_PERM)
+		writeFile("constant/status.go", codegen.GenerateConstantContent())
 
 		// controller
-		os.Mkdir("controller", 0755)
-		if controllerOutput, err := exec.Command("echo", codegen.GenerateControllerContent(), ">", "controller/example.go").Output(); err != nil {
-			panic("failed to create controller content output:" + string(controllerOutput))
-		}
+		os.Mkdir("controller", DIR_PERM)
+		writeFile("controller/example.go", codegen.GenerateControllerContent())
 
 		// exeption
-		os.Mkdir("exception", 0755)
-		if panicOutput, err := exec.Command("echo", codegen.GeneratePanicContent(cfg.Logging.Option), ">", "exception/panic.go").Output(); err != nil {
-			panic("failed to create panic content output:" + string(panicOutput))
-		}
+		os.Mkdir("exception", DIR_PERM)
+		writeFile("exception/panic.go", codegen.GeneratePanicContent(cfg.Logging.Option))
 
 		// model
-		os.Mkdir("model", 0755)
+		os.Mkdir("model", DIR_PERM)
 		err = os.Chdir("model")
-		os.Mkdir("entity", 0755)
-		os.Mkdir("dto", 0755)
-		if baseEntityOutput, err := exec.Command("echo", codegen.GenerateBaseEntity(), ">", "entity/base.go").Output(); err != nil {
-			panic("failed to create base entity content output:" + string(baseEntityOutput))
-		}
-		if exampleEntityOutput, err := exec.Command("echo", codegen.GenerateExampleEntity(), ">", "entity/example.go").Output(); err != nil {
-			panic("failed to create entity example content output:" + string(exampleEntityOutput))
-		}
+		os.Mkdir("entity", DIR_PERM)
+		os.Mkdir("dto", DIR_PERM)
+		writeFile("entity/base.go", codegen.GenerateBaseEntity())
+		writeFile("entity/example.go", codegen.GenerateExampleEntity())
 		err = os.Chdir("../")
 
 		// repository
-		os.Mkdir("repository", 0755)
-		if repositoryOutput, err := exec.Command("echo", codegen.GenerateRepositoryContent(cfg.DatabaseQueries), ">", "repository/example.go").Output(); err != nil {
-			panic("failed to create repository content output:" + string(repositoryOutput))
-		}
+		os.Mkdir("repository", DIR_PERM)
+		writeFile("repository/example.go", codegen.GenerateRepositoryContent(cfg.DatabaseQueries))
 
 		// router
-		os.Mkdir("router", 0755)
-		if routerOutput, err := exec.Command("echo", codegen.GenerateRouterContent(cfg.HttpLibrary), ">", "router/routes.go").Output(); err != nil {
-			panic("failed to create router content output:" + string(routerOutput))
-		}
-		if injectionOutput, err := exec.Command("echo", codegen.GenerateInjectionContent(), ">", "router/injection.go").Output(); err != nil {
-			panic("failed to create injection content output:" + string(injectionOutput))
-		}
+		os.Mkdir("router", DIR_PERM)
+		writeFile("router/routes.go", codegen.GenerateRouterContent(cfg.HttpLibrary))
+		writeFile("router/injection.go", codegen.GenerateInjectionContent())
 
 		// service
-		os.Mkdir("service", 0755)
-		if serviceOutput, err := exec.Command("echo", codegen.GenerateServiceContent(), ">", "service/example.go").Output(); err != nil {
-			panic("failed to create service content output:" + string(serviceOutput))
-		}
+		os.Mkdir("service", DIR_PERM)
+		writeFile("service/example.go", codegen.GenerateServiceContent())
 
+		err = os.Chdir("../")
 	}
 }
 
 // Can put the full path as project name if the user desire an alternative folder
 func GenereateProject(cfg model.Configuration) {
-	os.Mkdir(cfg.ProjectName, 0755)
+	os.Mkdir(cfg.ProjectName, DIR_PERM)
 
 	// FIXME: user should be able to specify the module name
 	cfg.ModuleName = "com." + cfg.ProjectName
@@ -174,11 +136,9 @@ func GenereateProject(cfg model.Configuration) {
 
 	createProjectFiles(cfg)
 
-	tidyCmd := exec.Command("go", "mod", "tidy")
-	tidyCmd.Dir = targetDir
-	tidyOutput, err := tidyCmd.Output()
+	_, err = exec.Command("go", "mod", "tidy").Output()
 	if err != nil {
-		panic("failed to run go mod tidy command : " + string(tidyOutput))
+		panic("failed to run go mod tidy command: " + err.Error())
 	}
 
 	os.Exit(0)
