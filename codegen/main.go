@@ -36,8 +36,8 @@ func GenerateMainContent(cfg model.Configuration) string {
 		package main
 
 		import (
-			"com.github.alissonbk/go-rest-template/app/router"
-			"com.github.alissonbk/go-rest-template/config"
+			"`+cfg.ModulePath+`/app/router"
+			"`+cfg.ModulePath+`/config"
 			%s
 			%s
 			"os"

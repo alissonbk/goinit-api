@@ -9,6 +9,7 @@ import (
 type Configuration struct {
 	ModuleName       string
 	ProjectName      string
+	ModulePath       string
 	HttpLibrary      constant.HttpLibrary
 	ProjectStructure constant.ProjectStructure
 	DatabaseQueries  constant.DatabaseQueries

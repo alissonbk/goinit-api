@@ -1,14 +1,19 @@
 package codegen
 
-func GenerateInjectionContent() string {
-	return `
+import (
+	"fmt"
+	"github.com/alissonbk/goinit-api/model"
+)
+
+func GenerateInjectionContent(cfg model.Configuration) string {
+	return fmt.Sprintf(`
 		package router
 
 		import (
-			"com.github.alissonbk/go-rest-template/app/controller"
-			"com.github.alissonbk/go-rest-template/app/repository"
-			"com.github.alissonbk/go-rest-template/app/service"
-			"com.github.alissonbk/go-rest-template/config"
+			"%s/app/controller"
+			"%s/app/repository"
+			"%s/app/service"
+			"%s/config"
 			"github.com/jmoiron/sqlx"
 		)
 
@@ -28,5 +33,5 @@ func GenerateInjectionContent() string {
 			s := service.NewExampleService(r)
 			return controller.NewExampleController(s)
 		}
-`
+`, cfg.ModulePath, cfg.ModulePath, cfg.ModulePath, cfg.ModulePath)
 }

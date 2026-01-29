@@ -1,12 +1,17 @@
 package codegen
 
-func GenerateServiceContent() string {
-	return `
+import (
+	"fmt"
+	"github.com/alissonbk/goinit-api/model"
+)
+
+func GenerateServiceContent(cfg model.Configuration) string {
+	return fmt.Sprintf(`
 		package service
 
 		import (
-			"com.github.alissonbk/go-rest-template/app/model/entity"
-			"com.github.alissonbk/go-rest-template/app/repository"
+			"%s/app/model/entity"
+			"%s/app/repository"
 		)
 
 		type ExampleService struct {
@@ -21,5 +26,5 @@ func GenerateServiceContent() string {
 			return s.repository.FindAllExample()
 		}
 		
-	`
+	`, cfg.ModulePath, cfg.ModulePath)
 }

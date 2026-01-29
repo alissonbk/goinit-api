@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"github.com/alissonbk/goinit-api/constant"
+	"github.com/alissonbk/goinit-api/model"
 )
 
 // TODO: fix zap logger import
-func GeneratePanicContent(logOption constant.LoggingOptions) string {
+func GeneratePanicContent(cfg model.Configuration) string {
 	var logCode = func() []any {
-		switch logOption {
+		switch cfg.Logging.Option {
 		case constant.Logrus:
 			return []any{
 				"github.com/sirupsen/logrus",
@@ -54,7 +55,7 @@ func GeneratePanicContent(logOption constant.LoggingOptions) string {
 			"strconv"
 			"strings"
 
-			"com.github.alissonbk/go-rest-template/app/constant"
+			"`+cfg.ModulePath+`/app/constant"
 			"github.com/gin-gonic/gin"
 			"%s"
 		)

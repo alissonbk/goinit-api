@@ -1,13 +1,18 @@
 package codegen
 
-func GenerateControllerContent() string {
-	return `
+import (
+	"fmt"
+	"github.com/alissonbk/goinit-api/model"
+)
+
+func GenerateControllerContent(cfg model.Configuration) string {
+	return fmt.Sprintf(`
 		package controller
 
 		
 		import (
-			"com.github.alissonbk/go-rest-template/app/exception"
-			"com.github.alissonbk/go-rest-template/app/service"
+			"%s/app/exception"
+			"%s/app/service"
 			"github.com/gin-gonic/gin"
 		)
 
@@ -22,6 +27,6 @@ func GenerateControllerContent() string {
 		func (uc *ExampleController) GetAll(ctx *gin.Context) {
 			defer exception.PanicHandler(ctx)
 			ctx.JSON(200, uc.service.GetAll())
-	}
-	`
+		}
+	`, cfg.ModulePath, cfg.ModulePath)
 }

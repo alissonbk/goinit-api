@@ -80,11 +80,11 @@ func createProjectFiles(cfg model.Configuration) {
 
 		// controller
 		os.Mkdir("controller", DIR_PERM)
-		writeFile("controller/example.go", codegen.GenerateControllerContent())
+		writeFile("controller/example.go", codegen.GenerateControllerContent(cfg))
 
 		// exeption
 		os.Mkdir("exception", DIR_PERM)
-		writeFile("exception/panic.go", codegen.GeneratePanicContent(cfg.Logging.Option))
+		writeFile("exception/panic.go", codegen.GeneratePanicContent(cfg))
 
 		// model
 		os.Mkdir("model", DIR_PERM)
@@ -97,16 +97,16 @@ func createProjectFiles(cfg model.Configuration) {
 
 		// repository
 		os.Mkdir("repository", DIR_PERM)
-		writeFile("repository/example.go", codegen.GenerateRepositoryContent(cfg.DatabaseQueries))
+		writeFile("repository/example.go", codegen.GenerateRepositoryContent(cfg))
 
 		// router
 		os.Mkdir("router", DIR_PERM)
 		writeFile("router/routes.go", codegen.GenerateRouterContent(cfg.HttpLibrary))
-		writeFile("router/injection.go", codegen.GenerateInjectionContent())
+		writeFile("router/injection.go", codegen.GenerateInjectionContent(cfg))
 
 		// service
 		os.Mkdir("service", DIR_PERM)
-		writeFile("service/example.go", codegen.GenerateServiceContent())
+		writeFile("service/example.go", codegen.GenerateServiceContent(cfg))
 
 		err = os.Chdir("../")
 	}
@@ -117,7 +117,8 @@ func GenereateProject(cfg model.Configuration) {
 	os.Mkdir(cfg.ProjectName, DIR_PERM)
 
 	// FIXME: user should be able to specify the module name
-	cfg.ModuleName = "com." + cfg.ProjectName
+	cfg.ModulePath = "github.com/" + cfg.ProjectName
+	cfg.ModuleName = cfg.ModulePath // Keep for backwards compatibility
 	targetDir := "./" + cfg.ProjectName
 
 	modinitCmd := exec.Command("go", "mod", "init", cfg.ModuleName)
