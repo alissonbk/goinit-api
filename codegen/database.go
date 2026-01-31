@@ -32,10 +32,10 @@ func GenerateDatabaseContent(cfg model.Configuration) string {
 
 	logLevelInfo := func() string {
 		if cfg.GodotEnv {
-			return `os.Getenv("DB_LOG_LEVEL")`
+			return `strings.ToUpper(os.Getenv("DB_LOG_LEVEL"))`
 		}
 
-		return cfg.Logging.Loglevel.ToString()
+		return "\"" + cfg.Logging.Loglevel.ToString() + "\""
 	}()
 
 	importMigrateDatabaseDriver := func() string {
@@ -149,14 +149,12 @@ func GenerateDatabaseContent(cfg model.Configuration) string {
 		return fmt.Sprintf(`
 			package config
 
-			import (
-				"github.com/sirupsen/logrus"
+			import (				
 				"gorm.io/driver/%[1]s"
 				"gorm.io/gorm"
 				gormlogger "gorm.io/gorm/logger"
 				"log"
-				"os"
-				"strconv"
+				"os"				
 				"strings"
 				"time"
 			)
@@ -187,7 +185,7 @@ func GenerateDatabaseContent(cfg model.Configuration) string {
 				var ignoreNotFound bool
 				var parameterizedQueries bool
 				var colorful bool
-				switch strings.ToUpper(%[3]s) {
+				switch %[3]s {
 				case "PROD":
 					logLevel = gormlogger.Warn
 					ignoreNotFound = true
