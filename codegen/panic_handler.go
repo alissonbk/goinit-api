@@ -14,6 +14,7 @@ func GeneratePanicContent(cfg model.Configuration) string {
 		case constant.Logrus:
 			return []any{
 				"github.com/sirupsen/logrus",
+				"",
 				`logrus.WithFields(logrus.Fields{
 					"path":     c.FullPath(),
 					"handlers": fmtContextHandlers(c.HandlerNames()),
@@ -30,6 +31,7 @@ func GeneratePanicContent(cfg model.Configuration) string {
 		case constant.Zap:
 			return []any{
 				"go.uber.org/zap",
+				"var logger *zap.Logger",
 				`logger.Error("Panic occurred during request processing",
 					zap.String("path", c.FullPath()),
 					zap.String("handlers", fmtContextHandlers(c.HandlerNames())),
@@ -48,8 +50,7 @@ func GeneratePanicContent(cfg model.Configuration) string {
 	return fmt.Sprintf(`
 		package exception
 
-		import (
-			"errors"
+		import (			
 			"fmt"
 			"net/http"
 			"strconv"
@@ -59,6 +60,8 @@ func GeneratePanicContent(cfg model.Configuration) string {
 			"github.com/gin-gonic/gin"
 			"%s"
 		)
+
+		%s
 
 		func buildResponse(status constant.ResponseStatus, message string) map[string]string {
 			return map[string]string{
@@ -120,8 +123,8 @@ func GeneratePanicContent(cfg model.Configuration) string {
 		}
 
 		// TODO: define when the panic handler should expose the message or not (to avoid exposing server information to the client)
-		func PanicException(statusKey constant.ResponseStatus, message string) {			
-			panic(fmt.Errorf("PanicException %%d: %%w", statusKey.GetNumber(), err))
+		func PanicException(statusKey constant.ResponseStatus, message string) {		
+			panic(fmt.Errorf("PanicException %%d: %%s", statusKey.GetNumber(), message))
 		}
 
 		func isPanicException(errStr string) bool {
