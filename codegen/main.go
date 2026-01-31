@@ -8,17 +8,17 @@ import (
 )
 
 func GenerateMainContent(cfg model.Configuration) string {
-	logImport := func() string {
+	logImport := func() []string {
 		if cfg.Logging.Option == constant.Logrus {
-			return `log "github.com/sirupsen/logrus"`
+			return []string{`log "github.com/sirupsen/logrus"`, ""}
 		}
-		return ""
+		return []string{"", "var log *zap.SugaredLogger"}
 	}()
 
 	// 0 - import
 	// 1 - load env
 	// 2 - port
-	godotEnvCodes := func() []string {
+	godotEnvParts := func() []string {
 		if cfg.GodotEnv {
 			return []string{
 				`"github.com/joho/godotenv"`,
@@ -30,7 +30,7 @@ func GenerateMainContent(cfg model.Configuration) string {
 				`port := os.Getenv("PORT")`,
 			}
 		}
-		return []string{"", "", "port := 5000"}
+		return []string{"", "", "port := \"5000\""}
 	}()
 	return fmt.Sprintf(`
 		package main
@@ -42,6 +42,8 @@ func GenerateMainContent(cfg model.Configuration) string {
 			%s
 			"os"
 		)
+
+		%s
 
 		func load() error {
 			%s
@@ -67,5 +69,5 @@ func GenerateMainContent(cfg model.Configuration) string {
 			log.Info("app listening on port " + port)
 		}
 
-	`, logImport, godotEnvCodes[0], godotEnvCodes[1], godotEnvCodes[2])
+	`, logImport[0], godotEnvParts[0], logImport[1], godotEnvParts[1], godotEnvParts[2])
 }

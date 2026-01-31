@@ -2,6 +2,7 @@ package codegen
 
 import (
 	"fmt"
+
 	"github.com/alissonbk/goinit-api/model"
 )
 
@@ -22,7 +23,7 @@ func GenerateServiceContent(cfg model.Configuration) string {
 			return &ExampleService{repository: repository}
 		}
 
-		func (s *ExampleService) GetAll() []*entity.Example {
+		func (s *ExampleService) GetAll() []entity.Example {
 			return s.repository.FindAllExample()
 		}
 		

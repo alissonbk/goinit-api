@@ -102,12 +102,12 @@ func generateZapLogsContent(logLevel constant.LogLevel, structured bool) string 
 			once   sync.Once
 		)
 
-		func InitLogger() {
+		func InitLog() {
 			once.Do(func() {
 				config := zap.Config{
 					Level:       %s,
 					Development: false,
-					Encoding:    %s,
+					Encoding:    "%s",
 					EncoderConfig: zapcore.EncoderConfig{
 						TimeKey:        "timestamp",
 						LevelKey:       "level",

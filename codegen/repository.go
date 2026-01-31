@@ -33,7 +33,7 @@ func GenerateRepositoryContent(cfg model.Configuration) string {
 			return &ExampleRepository{db: db}
 		}
 
-		func (u ExampleRepository) FindAllUser() []entity.Example {
+		func (u ExampleRepository) FindAllExample() []entity.Example {
 			var examples []entity.Example
 
 			var err = u.db.Find(&examples).Error
@@ -69,8 +69,8 @@ func GenerateRepositoryContent(cfg model.Configuration) string {
 			return &ExampleRepository{db: db}
 		}
 
-		func (u ExampleRepository) FindAllExample() []*entity.Example {
-			var examples []*entity.Example
+		func (u ExampleRepository) FindAllExample() []entity.Example {
+			var examples []entity.Example
 
 			rows, err := u.db.Queryx("select * from \"example\"")
 			if err != nil {
@@ -84,7 +84,7 @@ func GenerateRepositoryContent(cfg model.Configuration) string {
 				if err != nil {
 					exception.PanicException(constant.DBQueryFailed, "")
 				}
-				examples = append(examples, &entity.Example{
+				examples = append(examples, entity.Example{
 					Name: results["name"].(string),
 				})
 			}
