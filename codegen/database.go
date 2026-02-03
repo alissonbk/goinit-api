@@ -154,8 +154,7 @@ func GenerateDatabaseContent(cfg model.Configuration) string {
 				"gorm.io/gorm"
 				gormlogger "gorm.io/gorm/logger"
 				"log"
-				"os"				
-				"strings"
+				"os"								
 				"time"
 			)
 
