@@ -2,14 +2,18 @@ package tui
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/alissonbk/goinit-api/filegen"
 	"github.com/alissonbk/goinit-api/model"
 	"github.com/alissonbk/goinit-api/utils"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"golang.org/x/term"
 )
 
 const (
@@ -50,16 +54,22 @@ var listTitleStyle = lipgloss.NewStyle().PaddingLeft(1).PaddingRight(1).Backgrou
 
 var grayStyle = lipgloss.NewStyle().Foreground(darkGray)
 
+var borderStyle = lipgloss.NewStyle().BorderStyle(lipgloss.RoundedBorder())
+var textStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("45"))
+
 var errorStyle = lipgloss.NewStyle().Foreground(red)
 
 var _ tea.Model = (*TuiModel)(nil)
 
+type tickMsg int
 type TuiModel struct {
 	currentPage   int
 	form          *form
 	err           error
 	configuration model.Configuration
 	selected      map[int]uint8 // uint8 will be any constant type also works for y/n case
+	h, w          int
+	vp            viewport.Model
 }
 
 func NewTuiModel() TuiModel {
@@ -140,9 +150,14 @@ func (m TuiModel) updateConfigOption() {
 
 func (m TuiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tickMsg:
+		w, h, _ := term.GetSize(int(os.Stdout.Fd()))
+		if w != m.w || h != m.h {
+			m.updateSize(w, h)
+		}
+		return m, tea.Batch(tick, func() tea.Msg { return tea.WindowSizeMsg{Width: w, Height: h} })
 	case tea.KeyMsg:
 		switch msg.Type {
-
 		case tea.KeyEnter:
 			// FIXME: do a better checking
 			if strings.Trim(m.form.projectName.Value(), " ") == "" {
@@ -357,5 +372,21 @@ func (m TuiModel) View() string {
 		inputStyle.Width(30).Render(m.form.Dockerfile.SelectedItem().FilterValue()),
 		grayStyle.Render("Confirm? (y/n)"),
 	)
+}
 
+func (m TuiModel) updateSize(w, h int) {
+	m.w = w
+	m.h = h
+
+	m.vp = viewport.New(m.w, m.h)
+	m.vp.Style = borderStyle
+
+	text := fmt.Sprintf("Size: %d, %d", m.w, m.h)
+	rendered := textStyle.Copy().Width(m.w).Height(m.h).Render(text)
+	m.vp.SetContent(rendered)
+}
+
+func tick() tea.Msg {
+	time.Sleep(time.Second / 4)
+	return tickMsg(1)
 }
